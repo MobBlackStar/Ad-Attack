@@ -1,0 +1,6 @@
+/vendor
+/config/db.php
+.DS_Store
+.idea
+.vscode
+*.log

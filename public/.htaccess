@@ -1,0 +1,11 @@
+Options -MultiViews
+RewriteEngine On
+
+# TEAM: This is our "Bouncer". 
+# If a user tries to load an image or CSS file directly, let them.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Otherwise, force EVERYONE to go through the front door (index.php).
+# Nobody is allowed to access our back-end files directly.
+RewriteRule ^ index.php [QSA,L]
