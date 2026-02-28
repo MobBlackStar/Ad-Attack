@@ -28,4 +28,4 @@ require '../app/Views/partials/header.php';
     </div>
 </div>
 
-<?php require '../app/Views/partials/footer.php'; ?>
+<?php require  '../app/Views/partials/footer.php'; ?>

@@ -7,26 +7,31 @@ use App\Models\Brief;
 
 class BriefController extends Controller {
 
-    // TEAM: Moataz here. This is the "Lobby" method the Router was complaining about!
-    // This room shows the list of all challenges.
+    // TEAM: Moataz, Changed it so The Lobby - Now supports the Category Filter!
     public function index() {
         $model = new Brief();
+        
+        // Check if a category was requested in the URL (e.g. /brief/index?category=Tech)
+        $category = $_GET['category'] ?? 'All';
+
+        if ($category !== 'All') {
+            $allBriefs = $model->findByCategory($category);
+        } else {
+            $allBriefs = $model->findAll();
+        }
     
-        // We use the "findAll" tool that Fedi built into the Grandparent Model.
-        $allBriefs = $model->findAll();
-    
-        // We hand the data to the Artist (the View)
         $this->view('briefs/index', [
             'title'  => 'Ad-Attack | Briefing Room',
-            'briefs' => $allBriefs 
+            'briefs' => $allBriefs,
+            'currentCategory' => $category
         ]);
     }
 
-    // TEAM: This shows the form to create a new challenge.
     public function create() {
-        // Uncomment this when Donyes finishes Login!
+        // Donyes: I'll turn this back on once your Login system is pushed to main!
         /*
         if (!Session::isLoggedIn()) {
+            Session::flash('error', 'Login required to post a brief.');
             header('Location: ' . BASE_URL . '/auth/login');
             exit();
         }
@@ -34,28 +39,20 @@ class BriefController extends Controller {
         $this->view('briefs/create', ['title' => 'Ad-Attack | New Brief']);
     }
 
-    // TEAM: This is the logic to save the brief.
     public function store() {
-        
-        // 1. SECURITY CHECK: Verify CSRF Token (The Secret Handshake)
+        // Fedi: Secret Handshake Check (CSRF)
         if (!Session::checkCSRF($_POST['csrf_token'] ?? '')) {
-            die("Security Error: Invalid CSRF Token. Are you a robot?");
+            die("Security Error: Invalid Token.");
         }
 
         $model = new Brief();
-        // Go up 2 levels to get to 'public'
         $uploadDir = dirname(__DIR__, 2) . "/public/assets/uploads/";
 
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true); 
-        }
-
+        // Move the physical file to the vault
         $imageName = time() . '_' . $_FILES['brief_image']['name'];
-        $destination = $uploadDir . $imageName;
-
-        if (move_uploaded_file($_FILES['brief_image']['tmp_name'], $destination)) {
+        if (move_uploaded_file($_FILES['brief_image']['tmp_name'], $uploadDir . $imageName)) {
             $data = [
-                'agency_id'   => 1, // Fake ID until Login is ready
+                'agency_id'   => 1, // Placeholder
                 'title'       => $_POST['title'],
                 'description' => $_POST['description'],
                 'category'    => $_POST['category'],
@@ -63,34 +60,67 @@ class BriefController extends Controller {
                 'deadline'    => $_POST['deadline']
             ];
 
-            try {
-                if ($model->saveBrief($data)) {
-                    Session::flash('success', 'Challenge Launched!');
-                    // Use BASE_URL for safe redirect
-                    header('Location: ' . BASE_URL . '/brief'); 
-                    exit();
-                }
-            } catch (\Exception $e) {
-                die("DB Error: " . $e->getMessage());
+            if ($model->saveBrief($data)) {
+                Session::flash('success', 'Challenge Launched!');
+                header('Location: ' . BASE_URL . '/brief'); 
+                exit();
             }
-        } else {
-            die("Upload failed to: " . $destination);
         }
     }
-    // Fedi: This shows ONE specific brief when you click "View"
-    // The Router passes the ID automatically (e.g., /brief/show/5 -> $id = 5)
-    public function show($id) {
-        $model = new Brief();
-        $brief = $model->find($id); // This uses the Grandparent Model's find()
 
-        if (!$brief) {
-            die("Error: Brief not found.");
+    // TEAM: Moataz, Worked On The Shredder Action
+    public function delete($id) {
+        $model = new Brief();
+        $brief = $model->find($id);
+
+        // Security check: Only the owner (Agency 1) can delete
+        if ($brief && $brief->agency_id == 1) {
+            $model->deleteBrief($id);
+            Session::flash('success', 'Challenge shredded!');
+        } else {
+            Session::flash('error', 'Access Denied.');
+        }
+        header('Location: ' . BASE_URL . '/brief');
+    }
+
+    // TEAM: Moataz, Worked On Showing the Edit Form
+    public function edit($id) {
+        $model = new Brief();
+        $brief = $model->find($id);
+
+        if (!$brief || $brief->agency_id != 1) {
+            die("Error: You cannot edit this.");
         }
 
-        // Load the specific view for a single brief
-        $this->view('briefs/show', [
-            'title' => $brief->title,
+        $this->view('briefs/edit', [
+            'title' => 'Edit Brief: ' . $brief->title,
             'brief' => $brief
         ]);
+    }
+
+    // TEAM: Moataz, Worked On Processing the Edit (Update the cabinet)
+    public function update($id) {
+        if (!Session::checkCSRF($_POST['csrf_token'] ?? '')) die("CSRF Error");
+
+        $model = new Brief();
+        $data = [
+            'title'       => $_POST['title'],
+            'description' => $_POST['description'],
+            'category'    => $_POST['category'],
+            'deadline'    => $_POST['deadline']
+        ];
+
+        if ($model->updateBrief($id, $data)) {
+            Session::flash('success', 'Brief updated!');
+            header('Location: ' . BASE_URL . '/brief');
+            exit();
+        }
+    }
+
+    public function show($id) {
+        $model = new Brief();
+        $brief = $model->find($id);
+        if (!$brief) die("Not found.");
+        $this->view('briefs/show', ['title' => $brief->title, 'brief' => $brief]);
     }
 }
