@@ -8,4 +8,4 @@ RewriteCond %{REQUEST_FILENAME} !-d
 
 # Otherwise, force EVERYONE to go through the front door (index.php).
 # Nobody is allowed to access our back-end files directly.
-RewriteRule ^ index.php [QSA,L]
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]

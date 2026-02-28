@@ -4,86 +4,94 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Models\Ad;
 use App\Models\Comment;
-use App\Core\Session; // TEAM : On en a besoin pour le message de succès !
+use App\Core\Session; 
+use App\Core\Auth; // Architect tool for security
 
-// TEAM - Sarra : Je gère maintenant la réception des fichiers et des commentaires !
+// TEAM - Sarra : I'm the Gallery Curator! I handle the masterpieces and the feedback.
 class AdController extends Controller {
 
-    // TEAM : Affiche toutes les pubs
+    // TEAM : Display the whole gallery
     public function index() {
         $adModel = new Ad();
         $allAds = $adModel->findAll();
 
         $this->view('ads/gallery', [
-            'title' => 'La Galerie des Guerilleros',
+            'title' => 'Ad-Attack | The Gallery',
             'ads'   => $allAds
         ]);
     }
 
-    // TEAM : Affiche UNE pub avec ses commentaires
+    // TEAM : Show ONE specific masterpiece and its comments
     public function show($id) {
         $adModel = new Ad();
         $commentModel = new Comment();
 
         $ad = $adModel->find($id);
+        if (!$ad) { die("Masterpiece not found!"); }
+        
         $comments = $commentModel->getByAd($id);
 
         $this->view('ads/show', [
-            'title'    => 'Détails de la pépite',
+            'title'    => 'Judging: ' . $ad->slogan,
             'ad'       => $ad,
             'comments' => $comments
         ]);
     }
 
-    // TEAM : Affiche le formulaire d'envoi de pub
-    public function submit() {
-        $this->view('ads/submit', ['title' => 'Submit your Ad']);
+    // TEAM : Show the "Upload" room
+    public function submit($brief_id) {
+        // Only agencies can attack!
+        // Auth::requireLogin(); 
+        
+        $this->view('ads/submit', [
+            'title' => 'Launch an Attack',
+            'brief_id' => $brief_id
+        ]);
     }
 
-    // TEAM : Enregistre la pub et l'image
+    // TEAM : Physically save the Ad to the Warehouse (Database)
     public function store() {
+        // SECURITY: Check the Secret Handshake (CSRF)
+        if (!Session::checkCSRF($_POST['csrf_token'] ?? '')) {
+            die("Security Error: Handshake failed.");
+        }
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $image = $_FILES['ad_image'];
-            $targetDir = "assets/uploads/";
+            // Architect path logic
+            $targetDir = dirname(__DIR__, 2) . "/public/assets/uploads/";
             $fileName = time() . "_" . basename($image["name"]);
-            $targetFilePath = $targetDir . $fileName;
+            $destination = $targetDir . $fileName;
 
-            if (move_uploaded_file($image["tmp_name"], "../public/" . $targetFilePath)) {
+            if (move_uploaded_file($image["tmp_name"], $destination)) {
                 $adModel = new Ad();
                 $adModel->createAd([
-                    'brief_id'   => 1, 
-                    'agency_id'  => 1, 
+                    'brief_id'   => $_POST['brief_id'], 
+                    'agency_id'  => 1, // Temporarily 1 until Donyes finishes Login
                     'slogan'     => $_POST['slogan'],
-                    'image_path' => $targetFilePath
+                    'image_path' => $fileName // We only save the NAME in the DB
                 ]);
-                echo "<h1>Succès !</h1><p>Ton Ad est en ligne.</p><a href='index.php?url=ad/index'>Voir la galerie</a>";
+
+                Session::flash('message', 'Attack Launched Successfully! 🚀');
+                header("Location: " . BASE_URL . "/ad/index");
+                exit();
             } else {
-                echo "Erreur lors de l'upload.";
+                die("Upload failed to: " . $destination);
             }
         }
     }
 
-    // ======================================================
-    // TEAM - Sarra : VOICI LA FONCTION QUI MANQUAIT !
-    // ======================================================
+    // TEAM : Add a comment to the Golden Book
     public function comment() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            
             $ad_id = $_POST['ad_id'];
-            $content = $_POST['content'];
-            $agency_id = 1; // Temporaire en attendant le login de Donyes
-
             $commentModel = new Comment();
             
-            // On enregistre l'avis dans la base de données
-            $commentModel->add($ad_id, $agency_id, $content);
+            $commentModel->add($ad_id, 1, $_POST['content']);
 
-            // On met un petit message vert pour dire que c'est bon
-            Session::flash('success', 'Ton commentaire a été ajouté !');
-
-            // On renvoie l'utilisateur sur la page de la pub
-            header("Location: index.php?url=ad/show/" . $ad_id);
+            Session::flash('message', 'Your feedback has been pinned! 📌');
+            header("Location: " . BASE_URL . "/ad/show/" . $ad_id);
             exit();
         }
     }
-} // Fin de la classe
+}
