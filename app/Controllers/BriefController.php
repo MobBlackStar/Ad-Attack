@@ -3,35 +3,51 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Core\Session;
-// TEAM: Moataz here. I'm summoning the Warehouse Worker we just created.
 use App\Models\Brief;
 
 class BriefController extends Controller {
 
-    // TEAM: This just shows the form we made above.
+    // TEAM: Moataz here. This is the "Lobby" method the Router was complaining about!
+    // This room shows the list of all challenges.
+    // TEAM: Moataz here. I'm updating the Lobby to show REAL data from the DB!
+    public function index() {
+        $model = new Brief();
+    
+        // We use the "findAll" tool that Fedi built into the Grandparent Model.
+        // This grabs every challenge from the 'briefs' table.
+        $allBriefs = $model->findAll();
+    
+        // We hand the data to the Artist (the View)
+        $this->view('briefs/index', [
+            'title'  => 'Ad-Attack | Briefing Room',
+            'briefs' => $allBriefs // Passing the array of challenges
+        ]);
+    }
+
+    // TEAM: This shows the form to create a new challenge.
     public function create() {
-        // Fedi: I'm using your Session check here to keep guests out!
         if (!Session::isLoggedIn()) {
-            header('Location: /login');
+            header('Location: /Ad-Attack/public/index.php?url=home');
             exit();
         }
         $this->view('briefs/create', ['title' => 'Ad-Attack | New Brief']);
     }
 
-    // TEAM: This is the brain that handles the form submission.
+    // TEAM: This is the logic we just fixed.
     public function store() {
         $model = new Brief();
+        $uploadDir = dirname(__DIR__, 2) . "/public/assets/uploads/";
 
-        // 1. Handle the Image Upload (Moving the file to our folder)
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true); // Create the folder if it's missing
+        }
+
         $imageName = time() . '_' . $_FILES['brief_image']['name'];
-        $destination = "assets/uploads/" . $imageName;
-        
-        // Moataz: We must move the file from 'temporary memory' to our physical folder.
+        $destination = $uploadDir . $imageName;
+
         if (move_uploaded_file($_FILES['brief_image']['tmp_name'], $destination)) {
-            
-            // 2. Prepare the data for the Warehouse (Model)
             $data = [
-                'agency_id'   => Session::get('user_id'), // Who is posting this?
+                'agency_id'   => 1, // Fake ID for testing
                 'title'       => $_POST['title'],
                 'description' => $_POST['description'],
                 'category'    => $_POST['category'],
@@ -39,13 +55,18 @@ class BriefController extends Controller {
                 'deadline'    => $_POST['deadline']
             ];
 
-            // 3. Save to Database
-            if ($model->store($data)) {
-                echo "<h1>Success! Brief is live.</h1>";
-                // Eventually we will redirect to the homepage here.
+            try {
+                if ($model->saveBrief($data)) {
+                    Session::flash('success', 'Challenge Launched!');
+                    // This is where the redirect happened!
+                    header('Location: /Ad-Attack/public/index.php?url=brief/index');
+                    exit();
+                }
+            } catch (\Exception $e) {
+                die("DB Error: " . $e->getMessage());
             }
         } else {
-            echo "Team, the photo upload failed. Check the 'uploads' folder permissions!";
+            die("Upload failed to: " . $destination);
         }
     }
 }

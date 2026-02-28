@@ -19,8 +19,8 @@
         <div class="col-md-8">
             <h2 class="text-warning mb-4">📢 Post a New Creative Brief</h2>
             
-            <form action="/brief/store" method="POST" enctype="multipart/form-data" class="card bg-secondary p-4 shadow">
-                
+            <!-- TEAM: Moataz, I used the full absolute path here to make sure the Router finds us! -->
+            <form action="/Ad-Attack/public/index.php?url=brief/store" method="POST" enctype="multipart/form-data" class="card bg-secondary p-4 shadow">                
                 <div class="mb-3">
                     <label class="form-label">Challenge Title</label>
                     <input type="text" name="title" class="form-control" placeholder="e.g. Sell this 1990s Brick Phone" required>
