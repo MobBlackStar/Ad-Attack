@@ -1,4 +1,4 @@
-<?php require '../app/Views/partials/header.php'; ?>
+<?php require VIEW_PATH . '/partials/header.php'; ?>
 
 <div class="row justify-content-center">
     <div class="col-md-8">
@@ -46,5 +46,4 @@
         </form>
     </div>
 </div>
-
-<?php require '../app/Views/partials/footer.php'; ?>
+<?php require VIEW_PATH . '/partials/footer.php'; ?>
