@@ -2,7 +2,7 @@
 // TEAM: Welcome to the Router hehehe, Think of this file as the "Receptionist" of our building Yusss.
 // Nobody creates physical pages like 'login.php' anymore. 
 // Every user comes here first, and this script directs them to the right Controller.
-
+$_SESSION['user_id'] = 1; // For testing purposes, we pretend the user with ID 1 is logged in. Remove this in production!   
 // 1. Give everyone the Phonebook (Composer Autoload) so classes find each other.
 require_once '../vendor/autoload.php';
 

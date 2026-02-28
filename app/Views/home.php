@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Notice how we use the variable the Controller handed to us -->
     <title><?= $title ?></title>
-    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/Ad-Attack/public/assets/css/bootstrap.min.css">
 </head>
 <body class="bg-dark text-light">
 
