@@ -20,4 +20,19 @@ abstract class Model {
         $stmt = $this->db->query("SELECT * FROM {$this->table}");
         return $stmt->fetchAll();
     }
+
+    // salla7na el view function here
+
+    // Get ONE item by ID (The Detail Page needs this)
+    public function find($id) {
+        $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE id = :id");
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch();
+    }
+
+    // Delete an item (The "Shredder" needs this)
+    public function delete($id) {
+        $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE id = :id");
+        return $stmt->execute(['id' => $id]);
+    }
 }
