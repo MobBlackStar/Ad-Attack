@@ -2,12 +2,12 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Core\Session; 
+use App\Core\Auth; // Fedi: The Security Guard!
 use App\Models\Ad;
 use App\Models\Comment;
-use App\Core\Session; 
-use App\Core\Auth; // Architect tool for security
 
-// TEAM - Sarra : I'm the Gallery Curator! I handle the masterpieces and the feedback.
+// TEAM - Sarra : I am the Gallery Curator! I handle the masterpieces and the feedback.
 class AdController extends Controller {
 
     // TEAM : Display the whole gallery
@@ -15,7 +15,7 @@ class AdController extends Controller {
         $adModel = new Ad();
         $allAds = $adModel->findAll();
 
-        $this->view('ads/gallery', [
+        $this->view('ads/gallery',[
             'title' => 'Ad-Attack | The Gallery',
             'ads'   => $allAds
         ]);
@@ -27,38 +27,39 @@ class AdController extends Controller {
         $commentModel = new Comment();
 
         $ad = $adModel->find($id);
-        if (!$ad) { die("Masterpiece not found!"); }
+        if (!$ad) { die("Ad not found!"); }
         
-        $comments = $commentModel->getByAd($id);
+        // TEAM: This is where we grab the specific comments for this Ad
+        $comments = $commentModel->getByAd($id); 
 
         $this->view('ads/show', [
-            'title'    => 'Judging: ' . $ad->slogan,
+            'title'    => 'Reviewing: ' . $ad->slogan,
             'ad'       => $ad,
-            'comments' => $comments
+            'comments' => $comments // TEAM: Make sure this variable name matches the View!
         ]);
     }
 
-    // TEAM : Show the "Upload" room
+    // TEAM : Show the "Upload" room (Needs Brief ID to know which challenge we are answering)
     public function submit($brief_id) {
-        // Only agencies can attack!
-        // Auth::requireLogin(); 
+        // Fedi: Lock this room! Only logged-in agencies can submit ads.
+        // Auth::requireLogin(); // Uncomment when Donyes finishes Login
         
-        $this->view('ads/submit', [
+        $this->view('ads/submit',[
             'title' => 'Launch an Attack',
             'brief_id' => $brief_id
         ]);
     }
 
-    // TEAM : Physically save the Ad to the Warehouse (Database)
+    // TEAM : Physically save the Ad to the server and the Database
     public function store() {
         // SECURITY: Check the Secret Handshake (CSRF)
         if (!Session::checkCSRF($_POST['csrf_token'] ?? '')) {
-            die("Security Error: Handshake failed.");
+            die("Security Error: Handshake failed. Are you a hacker?");
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $image = $_FILES['ad_image'];
-            // Architect path logic
+            // Architect path logic to save in public/assets/uploads/
             $targetDir = dirname(__DIR__, 2) . "/public/assets/uploads/";
             $fileName = time() . "_" . basename($image["name"]);
             $destination = $targetDir . $fileName;
@@ -67,26 +68,27 @@ class AdController extends Controller {
                 $adModel = new Ad();
                 $adModel->createAd([
                     'brief_id'   => $_POST['brief_id'], 
-                    'agency_id'  => 1, // Temporarily 1 until Donyes finishes Login
+                    'agency_id'  => 1, // Fake ID until Login works
                     'slogan'     => $_POST['slogan'],
-                    'image_path' => $fileName // We only save the NAME in the DB
+                    'image_path' => $fileName 
                 ]);
 
                 Session::flash('message', 'Attack Launched Successfully! 🚀');
                 header("Location: " . BASE_URL . "/ad/index");
                 exit();
             } else {
-                die("Upload failed to: " . $destination);
+                die("Upload failed.");
             }
         }
     }
 
-    // TEAM : Add a comment to the Golden Book
+    // TEAM : Sarra, I moved this here from the Model. Controllers handle $_POST!
     public function comment() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $ad_id = $_POST['ad_id'];
             $commentModel = new Comment();
             
+            // Fake agency ID = 1 for now
             $commentModel->add($ad_id, 1, $_POST['content']);
 
             Session::flash('message', 'Your feedback has been pinned! 📌');
