@@ -24,16 +24,16 @@
                 
                 <!-- TEAM: Loop through the comments we got from the Manager -->
                  <div class="comment-box mb-4" style="max-height: 400px; overflow-y: auto;">
-                    <?php if(empty($comments)): ?>
-                        <p class="text-muted italic">No feedback yet. Be the first to judge!</p>
-                          <?php else: ?>
-                     <?php foreach($comments as $c): ?>
-                         <div class="p-3 mb-3 bg-dark rounded border-start border-warning border-4">
-                              <!-- Use the 'author' name we joined in the Model -->
-                                 <strong class="text-info"><?= htmlspecialchars($c->author) ?> :</strong>
-                        <p class="mb-0 mt-1"><?= htmlspecialchars($c->content) ?></p>
-                     <small class="text-muted" style="font-size: 10px;"><?= $c->created_at ?></small>
-                 </div>
+    <?php if(empty($comments)): ?>
+        <p class="text-muted italic">The jury is silent. Be the first to speak!</p>
+    <?php else: ?>
+        <?php foreach($comments as $c): ?>
+            <div class="p-3 mb-3 bg-dark rounded border-start border-warning border-4">
+                <!-- If 'author' is empty because Donyes isn't done, we show the ID -->
+                <strong class="text-info"><?= htmlspecialchars($c->author ?? 'Agency #'.$c->agency_id) ?> :</strong>
+                <p class="mb-0 mt-1 text-white"><?= htmlspecialchars($c->content) ?></p>
+                <small class="text-muted" style="font-size: 10px;"><?= $c->created_at ?></small>
+            </div>
         <?php endforeach; ?>
     <?php endif; ?>
 </div>

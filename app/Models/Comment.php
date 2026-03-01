@@ -1,14 +1,15 @@
 <?php
 namespace App\Models;
+
 use App\Core\Model;
 
-// TEAM - Sarra : C'est mon archiviste pour les commentaires.
-// Fedi: J'ai nettoyé ce fichier pour qu'il respecte le MVC (Aucun $_POST ici !)
+// TEAM - Sarra: This is our Archivist for feedback. 
+// It handles the "Handshake" with the database to get comments.
 class Comment extends Model {
     
     protected $table = 'comments';
 
-    // TEAM : On enregistre un commentaire pour une pub précise
+    // Save a new feedback to the database
     public function add($ad_id, $agency_id, $content) {
         $sql = "INSERT INTO comments (ad_id, agency_id, content) VALUES (:ad, :agency, :content)";
         $stmt = $this->db->prepare($sql);
@@ -19,12 +20,14 @@ class Comment extends Model {
         ]);
     }
 
-    // TEAM : On récupère tous les avis d'une pub spécifique (avec le nom de l'agence)
+    // Retrieve comments with the Author's name
     public function getByAd($ad_id) {
         $sql = "SELECT comments.*, agencies.name as author 
                 FROM comments 
-                JOIN agencies ON comments.agency_id = agencies.id 
-                WHERE ad_id = :id ORDER BY created_at DESC";
+                LEFT JOIN agencies ON comments.agency_id = agencies.id 
+                WHERE ad_id = :id 
+                ORDER BY comments.created_at DESC";
+        
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['id' => $ad_id]);
         return $stmt->fetchAll();

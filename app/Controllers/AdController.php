@@ -26,16 +26,18 @@ class AdController extends Controller {
         $adModel = new Ad();
         $commentModel = new Comment();
 
+        // 1. Grab the specific Ad from the warehouse
         $ad = $adModel->find($id);
-        if (!$ad) { die("Ad not found!"); }
+        if (!$ad) { die("Team: Ad #$id not found in DB!"); }
         
-        // TEAM: This is where we grab the specific comments for this Ad
+        // 2. Grab the comments for this specific Ad
         $comments = $commentModel->getByAd($id); 
 
+        // 3. Hand BOTH the Ad and the Comments to the View
         $this->view('ads/show', [
-            'title'    => 'Reviewing: ' . $ad->slogan,
+            'title'    => 'Judging: ' . $ad->slogan,
             'ad'       => $ad,
-            'comments' => $comments // TEAM: Make sure this variable name matches the View!
+            'comments' => $comments // If this line is missing, the Golden Book stays empty!
         ]);
     }
 
