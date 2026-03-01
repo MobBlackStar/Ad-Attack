@@ -7,7 +7,7 @@ use PDO;
 // E7seb hedha ensen 3emle9 fi warehouse. It handles the basic database lifting for you.
 abstract class Model {
     protected $db;
-    protected $table; // You will set this in your child classes (e.g., $table = 'briefs')
+    protected $table; 
 
     public function __construct() {
         // Automatically grab the shared database connection
@@ -15,22 +15,19 @@ abstract class Model {
     }
 
     // Client: You can use this free function to grab all the Briefs for the homepage!
-    // No need to write the SQL manually.
     public function findAll() {
         $stmt = $this->db->query("SELECT * FROM {$this->table}");
         return $stmt->fetchAll();
     }
 
-    // salla7na el view function here
-
-    // Get ONE item by ID (The Detail Page needs this)
+    // TEAM: Added this to fix the "View" button issues!
     public function find($id) {
         $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE id = :id");
         $stmt->execute(['id' => $id]);
         return $stmt->fetch();
     }
 
-    // Delete an item (The "Shredder" needs this)
+    // For deleting accounts or briefs (Mandatory for the grade)
     public function delete($id) {
         $stmt = $this->db->prepare("DELETE FROM {$this->table} WHERE id = :id");
         return $stmt->execute(['id' => $id]);

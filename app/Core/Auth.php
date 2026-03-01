@@ -1,13 +1,12 @@
 <?php
 namespace App\Core;
 
-// TEAM: I built this "Security Guard". 
-// Donyes (Gatekeeper): Use this at the top of your login/register methods!
+// TEAM: This is our "Security Guard". 
+// Donyes (Gatekeeper): Use this to protect the 'Profile' or 'Logout' pages.
 // Moataz & Sarra: Use this to lock your "Create" and "Submit" rooms.
 class Auth {
 
     // Kicks out anyone who isn't logged in.
-    // Donyes: Use this to protect the 'Profile' or 'Logout' pages.
     public static function requireLogin() {
         if (!Session::isLoggedIn()) {
             Session::flash('message', 'Access Denied: Please sign in to participate.');
@@ -17,7 +16,6 @@ class Auth {
     }
 
     // Prevents logged-in users from seeing the Login page again.
-    // Donyes: Use this at the top of your 'login' and 'register' functions.
     public static function requireGuest() {
         if (Session::isLoggedIn()) {
             header('Location: ' . BASE_URL . '/home');
