@@ -21,6 +21,12 @@
                 <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/brief">Challenges</a></li>
                 
                 <?php if(\App\Core\Session::isLoggedIn()): ?>
+                    <!-- TEAM: Secret passageway for the Boss (User ID 1) -->
+                        <?php if(\App\Core\Session::get('user_id') == 1): ?>
+                        <li class="nav-item">
+                            <a class="nav-link text-danger fw-bold" href="<?= BASE_URL ?>/admin">⚙️ God Mode</a>
+                        </li>
+                        <?php endif; ?>
                     <li class="nav-item"><a class="nav-link text-danger" href="<?= BASE_URL ?>/auth/logout">Logout</a></li>
                 <?php else: ?>
                     <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/auth/login">Login</a></li>
