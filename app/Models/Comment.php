@@ -22,7 +22,7 @@ class Comment extends Model {
 
     // Retrieve comments with the Author's name
     public function getByAd($ad_id) {
-        $sql = "SELECT comments.*, agencies.name as author 
+        $sql = "SELECT comments.*, agencies.name as author, agencies.id as agency_id
                 FROM comments 
                 LEFT JOIN agencies ON comments.agency_id = agencies.id 
                 WHERE ad_id = :id 
@@ -30,6 +30,20 @@ class Comment extends Model {
         
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['id' => $ad_id]);
-        return $stmt->fetchAll();
+        $comments = $stmt->fetchAll();
+
+        // ARCHITECT MAGIC: Measure the Cultivation Level of each commenter
+        $agencyModel = new \App\Models\Agency();
+        
+        foreach ($comments as $comment) {
+            if ($comment->agency_id) {
+                // Returns the Array ['rank' => '...', 'color' => '...']
+                $comment->cultivation = $agencyModel->getCultivationRank($comment->agency_id);
+            } else {
+                $comment->cultivation = ['rank' => '👻 Wandering Ghost', 'color' => 'badge bg-dark'];
+            }
+        }
+
+        return $comments;
     }
 }
