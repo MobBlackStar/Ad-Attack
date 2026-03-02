@@ -1,4 +1,4 @@
-<?php require VIEW_PATH . '/partials/header.php'; ?>
+<?php require '../app/Views/partials/header.php'; ?>
 
 <div class="container mt-4">
     <!-- TEAM: The Top Bar -->
@@ -8,13 +8,13 @@
     </div>
 
     <!-- TEAM: The Category Filter -->
-    <form action="<?= BASE_URL ?>/brief/index" method="GET" class="row g-2 mb-5 bg-secondary p-3 rounded shadow-sm">
+    <form action="<?= BASE_URL ?>/brief" method="GET" class="row g-2 mb-5 bg-secondary p-3 rounded shadow-sm">
         <div class="col-md-3">
             <select name="category" class="form-select bg-dark text-white border-0">
-                <option value="All">All Categories</option>
-                <option value="Tech">Tech</option>
-                <option value="Food">Food</option>
-                <option value="Absurd">Absurd</option>
+                <option value="All" <?= ($currentCategory ?? '') == 'All' ? 'selected' : '' ?>>All Categories</option>
+                <option value="Tech" <?= ($currentCategory ?? '') == 'Tech' ? 'selected' : '' ?>>Tech</option>
+                <option value="Food" <?= ($currentCategory ?? '') == 'Food' ? 'selected' : '' ?>>Food</option>
+                <option value="Absurd" <?= ($currentCategory ?? '') == 'Absurd' ? 'selected' : '' ?>>Absurd</option>
             </select>
         </div>
         <div class="col-md-2">
@@ -25,6 +25,9 @@
     <!-- TEAM: Flash Messages (Error/Success) -->
     <?php if($msg = \App\Core\Session::flash('success')): ?>
         <div class="alert alert-success border-0 mb-4"><?= $msg ?></div>
+    <?php endif; ?>
+    <?php if($msg = \App\Core\Session::flash('message')): ?>
+        <div class="alert alert-info border-0 mb-4"><?= $msg ?></div>
     <?php endif; ?>
 
     <div class="row">
@@ -45,13 +48,36 @@
                                 <a href="<?= BASE_URL ?>/brief/show/<?= $brief->id ?>" class="btn btn-warning w-100 mb-2 fw-bold">View & Submit</a>
                                 
                                 <!-- MOATAZ: HERE IS THE SHREDDER (Delete) AND EDIT BUTTONS! -->
-                                <div class="d-flex gap-2">
-                                    <a href="<?= BASE_URL ?>/brief/edit/<?= $brief->id ?>" class="btn btn-sm btn-info w-50">Edit</a>
-                                    <!-- Delete uses a confirmation popup for safety -->
-                                    <a href="<?= BASE_URL ?>/brief/delete/<?= $brief->id ?>" 
-                                       class="btn btn-sm btn-danger w-50" 
-                                       onclick="return confirm('Team: Are you sure you want to SHRED this challenge?')">Delete</a>
-                                </div>
+                                <!-- SECURITY: Only show these if the logged-in user OWNS the brief (or is Admin) -->
+                                <?php if(\App\Core\Auth::id() == $brief->agency_id || \App\Core\Auth::id() == 1): ?>
+                                    <div class="d-flex gap-2">
+                                        <a href="<?= BASE_URL ?>/brief/edit/<?= $brief->id ?>" class="btn btn-sm btn-info w-50">Edit</a>
+                                        
+                                        <!-- The Modal Trigger (Replaces the ugly confirm popup) -->
+                                        <button type="button" class="btn btn-sm btn-danger w-50" data-bs-toggle="modal" data-bs-target="#deleteModal-<?= $brief->id ?>">
+                                            Delete
+                                        </button>
+                                    </div>
+
+                                    <!-- THE MODAL (Hidden by default) -->
+                                    <div class="modal fade" id="deleteModal-<?= $brief->id ?>" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content bg-dark text-white border-warning">
+                                                <div class="modal-header border-secondary">
+                                                    <h5 class="modal-title text-warning">Confirm Shredding</h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    Team: Are you sure you want to <strong>SHRED</strong> "<?= htmlspecialchars($brief->title) ?>"?
+                                                </div>
+                                                <div class="modal-footer border-secondary">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <a href="<?= BASE_URL ?>/brief/delete/<?= $brief->id ?>" class="btn btn-danger fw-bold">Yes, Shred It</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -61,4 +87,4 @@
     </div>
 </div>
 
-<?php require VIEW_PATH . '/partials/footer.php'; ?>
+<?php require '../app/Views/partials/footer.php'; ?>

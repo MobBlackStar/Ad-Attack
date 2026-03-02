@@ -8,7 +8,7 @@
             <!-- TEAM: Moataz here. This form sends data to the 'update' method in the Controller -->
             <form action="<?= BASE_URL ?>/brief/update/<?= $brief->id ?>" method="POST" class="card bg-secondary p-4 shadow">
                 
-                <!-- THE SHIELD: Don't forget the CSRF token Fedi asked for! -->
+                <!-- THE SHIELD: Don't forget the CSRF token Fedi asked for -->
                 <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::generateCSRF(); ?>">
 
                 <div class="mb-3">
