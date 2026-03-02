@@ -23,9 +23,17 @@
 
             <div class="mt-5">
                 <!-- This button will link to Sarra's AdController later -->
-                <a href="<?= BASE_URL ?>/ad/submit/<?= $brief->id ?>" class="btn btn-lg btn-primary w-100 mb-3 shadow">
-                    🎨 Submit My Design
-                </a>
+               <?php if(\App\Core\Session::isLoggedIn()): ?>
+    <a href="<?= BASE_URL ?>/ad/submit/<?= $brief->id ?>" class="btn btn-lg btn-primary w-100 mb-3 shadow">
+        🎨 Submit My Design
+    </a>
+<?php else: ?>
+    <div class="alert alert-secondary text-center border-0 shadow">
+        <h5 class="text-warning">Want to participate?</h5>
+        <p class="small text-light">Only registered agencies can submit designs to this brief.</p>
+        <a href="<?= BASE_URL ?>/auth/login" class="btn btn-warning w-100 fw-bold">JOIN THE ARENA</a>
+    </div>
+<?php endif; ?>
                 <a href="<?= BASE_URL ?>/brief" class="btn btn-outline-light">Back to List</a>
             </div>
         </div>

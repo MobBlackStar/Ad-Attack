@@ -1,0 +1,62 @@
+<?php require '../app/Views/partials/header.php'; ?>
+
+<div class="container mt-5">
+    <div class="row">
+        
+        <!-- 🖼️ The Giant Ad -->
+        <div class="col-md-7">
+            <div class="card bg-secondary border-0 shadow-lg">
+                <img src="<?= BASE_URL ?>/assets/uploads/<?= $ad->image_path ?>" class="img-fluid rounded-top" alt="Ad">
+                <div class="card-body text-center">
+                    <h2 class="text-warning italic">"<?= $ad->slogan ?>"</h2>
+                    <p class="text-info small">By Agency #<?= $ad->agency_id ?></p>
+                </div>
+            </div>
+            <div class="mt-4">
+                <a href="<?= BASE_URL ?>/ad/index" class="btn btn-outline-light">← Gallery</a>
+            </div>
+        </div>
+
+        <!-- 💬 The Comment Section -->
+        <div class="col-md-5">
+            <div class="card bg-secondary p-4 shadow-lg h-100">
+                <h3 class="text-warning mb-4">Golden Book</h3>
+                
+                <!-- TEAM: Loop through the comments we got from the Manager -->
+                 <div class="comment-box mb-4" style="max-height: 400px; overflow-y: auto;">
+    <?php if(empty($comments)): ?>
+        <p class="text-muted italic">The jury is silent. Be the first to speak!</p>
+    <?php else: ?>
+        <?php foreach($comments as $c): ?>
+            <div class="p-3 mb-3 bg-dark rounded border-start border-warning border-4">
+                <!-- If 'author' is empty because Donyes isn't done, we show the ID -->
+                <strong class="text-info"><?= htmlspecialchars($c->author ?? 'Agency #'.$c->agency_id) ?> :</strong>
+                <p class="mb-0 mt-1 text-white"><?= htmlspecialchars($c->content) ?></p>
+                <small class="text-muted" style="font-size: 10px;"><?= $c->created_at ?></small>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</div>
+
+                <hr class="border-secondary">
+
+                <!-- Comment Form -->
+                <!-- FEDI'S GUEST MODE SHIELD -->
+<?php if(\App\Core\Session::isLoggedIn()): ?>
+    <form action="<?= BASE_URL ?>/ad/comment" method="POST" class="mt-auto">
+        <input type="hidden" name="ad_id" value="<?= $ad->id ?>">
+        <div class="mb-3">
+            <label class="form-label small text-warning">Your Marketing Expertise:</label>
+            <textarea name="content" class="form-control bg-dark text-white border-0" rows="3" placeholder="Write your review..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-warning w-100 fw-bold shadow">POST FEEDBACK</button>
+    </form>
+<?php else: ?>
+    <div class="alert alert-dark border border-warning text-center mt-auto">
+        <p class="mb-2 text-light">You must be an agency to leave feedback or vote.</p>
+        <a href="<?= BASE_URL ?>/auth/login" class="btn btn-sm btn-outline-warning">Login</a>
+        <a href="<?= BASE_URL ?>/auth/register" class="btn btn-sm btn-warning">Register</a>
+    </div>
+<?php endif; ?>
+
+<?php require '../app/Views/partials/footer.php'; ?>
