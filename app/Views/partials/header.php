@@ -20,8 +20,18 @@
                 <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/brief">Challenges</a></li>
                 
                 <?php if(\App\Core\Session::isLoggedIn()): ?>
-                    <li class="nav-item"><a class="nav-link text-danger" href="<?= BASE_URL ?>/auth/logout">Logout</a></li>
-                <?php else: ?>
+<li class="nav-item d-flex align-items-center">
+    <!-- Affiche le nom de l'agence -->
+    <span class="navbar-text text-light me-3">
+        Salut, <strong class="text-info"><?= \App\Core\Session::get('user_name') ?></strong>
+    </span>
+    <!-- Le bouton vers le profil -->
+    <a href="<?= BASE_URL ?>/auth/profile" class="btn btn-info btn-sm fw-bold rounded-pill px-3">
+my agent 
+</a>
+</li>
+
+                    <?php else: ?>
                     <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/auth/login">Login</a></li>
                 <?php endif; ?>
             </ul>
