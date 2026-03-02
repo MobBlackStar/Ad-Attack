@@ -3,65 +3,58 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Core\Session; 
-use App\Core\Auth; // Fedi: The Security Guard!
 use App\Models\Ad;
 use App\Models\Comment;
+// TEAM: Importing the Security Guard to verify badges.
+use App\Core\Auth;
 
-// TEAM - Sarra : I am the Gallery Curator! I handle the masterpieces and the feedback.
 class AdController extends Controller {
 
-    // TEAM : Display the whole gallery
+    // THE EXHIBITION: Shows all ads.
     public function index() {
         $adModel = new Ad();
-        $allAds = $adModel->findAll();
-
-        $this->view('ads/gallery',[
+        $this->view('ads/gallery', [
             'title' => 'Ad-Attack | The Gallery',
-            'ads'   => $allAds
+            'ads'   => $adModel->findAll()
         ]);
     }
 
-    // TEAM : Show ONE specific masterpiece and its comments
+    // THE JUDGING ROOM: Shows one ad and the comments.
     public function show($id) {
         $adModel = new Ad();
         $commentModel = new Comment();
 
-        // 1. Grab the specific Ad from the warehouse
         $ad = $adModel->find($id);
-        if (!$ad) { die("Team: Ad #$id not found in DB!"); }
+        if (!$ad) { die("This Masterpiece does not exist!"); }
         
-        // 2. Grab the comments for this specific Ad
-        $comments = $commentModel->getByAd($id); 
+        $comments = $commentModel->getByAd($id);
 
-        // 3. Hand BOTH the Ad and the Comments to the View
         $this->view('ads/show', [
             'title'    => 'Judging: ' . $ad->slogan,
             'ad'       => $ad,
-            'comments' => $comments // If this line is missing, the Golden Book stays empty!
+            'comments' => $comments 
         ]);
     }
 
-    // TEAM : Show the "Upload" room (Needs Brief ID to know which challenge we are answering)
+    // THE UPLOAD ROOM: Shows the submission form.
     public function submit($brief_id) {
-        // Fedi: Lock this room! Only logged-in agencies can submit ads.
-        // Auth::requireLogin(); // Uncomment when Donyes finishes Login
+        // TEAM: You shall not pass! (Unless you are logged in)
+        Auth::requireLogin(); 
         
-        $this->view('ads/submit',[
+        $this->view('ads/submit', [
             'title' => 'Launch an Attack',
             'brief_id' => $brief_id
         ]);
     }
 
-    // TEAM : Physically save the Ad to the server and the Database
+    // THE LOGIC: Saves the Ad.
     public function store() {
-        // SECURITY: Check the Secret Handshake (CSRF)
         if (!Session::checkCSRF($_POST['csrf_token'] ?? '')) {
-            die("Security Error: Handshake failed. Are you a hacker?");
+            die("Security Error: Handshake Failed.");
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $image = $_FILES['ad_image'];
-            // Architect path logic to save in public/assets/uploads/
             $targetDir = dirname(__DIR__, 2) . "/public/assets/uploads/";
             $fileName = time() . "_" . basename($image["name"]);
             $destination = $targetDir . $fileName;
@@ -70,7 +63,8 @@ class AdController extends Controller {
                 $adModel = new Ad();
                 $adModel->createAd([
                     'brief_id'   => $_POST['brief_id'], 
-                    'agency_id'  => 1, // Fake ID until Login works
+                    // TEAM: Using the real ID badge now! No more fake "User 1".
+                    'agency_id'  => Auth::id(), 
                     'slogan'     => $_POST['slogan'],
                     'image_path' => $fileName 
                 ]);
@@ -78,23 +72,23 @@ class AdController extends Controller {
                 Session::flash('message', 'Attack Launched Successfully! 🚀');
                 header("Location: " . BASE_URL . "/ad/index");
                 exit();
-            } else {
-                die("Upload failed.");
             }
         }
     }
 
-    // TEAM : Sarra, I moved this here from the Model. Controllers handle $_POST!
+    // THE FEEDBACK LOGIC: Saves comments.
     public function comment() {
+        // TEAM: Only agencies with a badge can speak in the Golden Book.
+        Auth::requireLogin();
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $ad_id = $_POST['ad_id'];
             $commentModel = new Comment();
             
-            // Fake agency ID = 1 for now
-            $commentModel->add($ad_id, 1, $_POST['content']);
+            // TEAM: We are signing the comment with the REAL user ID.
+            $commentModel->add($_POST['ad_id'], Auth::id(), $_POST['content']);
 
-            Session::flash('message', 'Your feedback has been pinned! 📌');
-            header("Location: " . BASE_URL . "/ad/show/" . $ad_id);
+            Session::flash('message', 'Feedback pinned to the gallery! 📌');
+            header("Location: " . BASE_URL . "/ad/show/" . $_POST['ad_id']);
             exit();
         }
     }

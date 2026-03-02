@@ -41,18 +41,22 @@
                 <hr class="border-secondary">
 
                 <!-- Comment Form -->
-                <form action="<?= BASE_URL ?>/ad/comment" method="POST" class="mt-auto">
-                    <input type="hidden" name="ad_id" value="<?= $ad->id ?>">
-                    <div class="mb-3">
-                        <label class="form-label small text-warning">Your Marketing Expertise:</label>
-                        <textarea name="content" class="form-control bg-dark text-white border-0" rows="3" placeholder="Write your review..." required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-warning w-100 fw-bold">POST FEEDBACK</button>
-                </form>
-            </div>
+                <!-- FEDI'S GUEST MODE SHIELD -->
+<?php if(\App\Core\Session::isLoggedIn()): ?>
+    <form action="<?= BASE_URL ?>/ad/comment" method="POST" class="mt-auto">
+        <input type="hidden" name="ad_id" value="<?= $ad->id ?>">
+        <div class="mb-3">
+            <label class="form-label small text-warning">Your Marketing Expertise:</label>
+            <textarea name="content" class="form-control bg-dark text-white border-0" rows="3" placeholder="Write your review..." required></textarea>
         </div>
-
+        <button type="submit" class="btn btn-warning w-100 fw-bold shadow">POST FEEDBACK</button>
+    </form>
+<?php else: ?>
+    <div class="alert alert-dark border border-warning text-center mt-auto">
+        <p class="mb-2 text-light">You must be an agency to leave feedback or vote.</p>
+        <a href="<?= BASE_URL ?>/auth/login" class="btn btn-sm btn-outline-warning">Login</a>
+        <a href="<?= BASE_URL ?>/auth/register" class="btn btn-sm btn-warning">Register</a>
     </div>
-</div>
+<?php endif; ?>
 
 <?php require '../app/Views/partials/footer.php'; ?>
