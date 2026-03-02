@@ -20,7 +20,7 @@ class Comment extends Model {
         ]);
     }
 
-    // Retrieve comments with the Author's name
+    // trouve tous les commentaires liés à un ad spécifique
     public function getByAd($ad_id) {
         $sql = "SELECT comments.*, agencies.name as author, agencies.id as agency_id
                 FROM comments 
