@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-    <script src="<?= BASE_URL ?>/assets/js/vote.js" defer></script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +8,10 @@
     
     <!-- THE FIX: Using BASE_URL to handle VirtualHost vs Localhost -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/bootstrap.min.css">
+    
+    <!-- FEDI: DO NOT FORGET THE JS SCRIPTS FOR MODALS AND VOTING! -->
+    <script src="<?= BASE_URL ?>/assets/js/vote.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
 </head>
 <body class="bg-dark text-light">
 
@@ -19,15 +22,33 @@
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/brief">Challenges</a></li>
+                <!-- FEDI: Donyes accidentally deleted the Gallery link! Restored it. -->
+                <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/ad">Gallery</a></li>
                 
                 <?php if(\App\Core\Session::isLoggedIn()): ?>
-                    <!-- TEAM: Secret passageway for the Boss (User ID 1) -->
-                        <?php if(\App\Core\Session::get('user_id') == 1): ?>
-                        <li class="nav-item">
+                    
+                    <!-- FEDI'S GOD MODE (Only for ID 1) -->
+                    <?php if(\App\Core\Session::get('user_id') == 1): ?>
+                        <li class="nav-item d-flex align-items-center me-3">
                             <a class="nav-link text-danger fw-bold" href="<?= BASE_URL ?>/admin">⚙️ God Mode</a>
                         </li>
-                        <?php endif; ?>
-                    <li class="nav-item"><a class="nav-link text-danger" href="<?= BASE_URL ?>/auth/logout">Logout</a></li>
+                    <?php endif; ?>
+
+                    <li class="nav-item d-flex align-items-center">
+                        <!-- Affiche le nom de l'agence (Donyes's UI) -->
+                        <span class="navbar-text text-light me-3">
+                            Salut, <strong class="text-info"><?= htmlspecialchars(\App\Core\Session::get('user_name')) ?></strong>
+                        </span>
+                        <!-- Le bouton vers le profil -->
+                        <a href="<?= BASE_URL ?>/auth/profile" class="btn btn-info btn-sm fw-bold rounded-pill px-3 me-2">
+                            My Agency 
+                        </a>
+                        <!-- FEDI: Donyes accidentally deleted Logout! Restored it. -->
+                        <a href="<?= BASE_URL ?>/auth/logout" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                            Logout
+                        </a>
+                    </li>
+
                 <?php else: ?>
                     <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/auth/login">Login</a></li>
                 <?php endif; ?>
@@ -38,5 +59,5 @@
 
 <div class="container">
     <?php $msg = \App\Core\Session::flash('message'); if($msg): ?>
-        <div class="alert alert-info"><?= $msg ?></div>
+        <div class="alert alert-info border-0 shadow-sm"><?= $msg ?></div>
     <?php endif; ?>
