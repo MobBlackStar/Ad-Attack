@@ -13,15 +13,15 @@ class AdController extends Controller {
     // TEAM: Sarra - The Ad Shredder. 
     // Only the artist who made the Ad (or the Overlord) can delete it.
     public function delete($id) {
-        \App\Core\Auth::requireLogin();
+        Auth::requireLogin();
         $model = new Ad();
         $ad = $model->find($id);
 
-        if ($ad && ($ad->agency_id == \App\Core\Auth::id() || \App\Core\Auth::id() == 1)) {
+        if ($ad && ($ad->agency_id == Auth::id() || Auth::id() == 1)) {
             $model->delete($id);
-            \App\Core\Session::flash('message', 'Masterpiece removed from gallery.');
+            Session::flash('message', 'Masterpiece removed from gallery.');
         }
-        header('Location: ' . BASE_URL . '/ad/index');
+        header('Location: ' . BASE_URL . '/index.php?url=ad/index');
         exit();
     }
 
@@ -53,7 +53,6 @@ class AdController extends Controller {
         $ad = $adModel->find($id);
         if (!$ad) { die("Cette œuvre n'existe pas !"); }
         
-        // Add voting data to the specific Ad object
         $ad->vote_count = $voteModel->getCount($ad->id);
         $ad->has_voted = Session::isLoggedIn() ? $voteModel->hasVoted($ad->id, Auth::id()) : false;
 
@@ -93,7 +92,7 @@ class AdController extends Controller {
                 ]);
 
                 Session::flash('success', 'L\'attaque est lancée ! 🚀');
-                header("Location: " . BASE_URL . "/ad/index");
+                header("Location: " . BASE_URL . "/index.php?url=ad/index");
                 exit();
             } else {
                 echo "Erreur lors de l'upload de l'image.";
@@ -109,8 +108,36 @@ class AdController extends Controller {
             $commentModel->add($ad_id, $agency_id, $_POST['content']);
 
             Session::flash('success', 'Avis ajouté au Livre d\'Or ! 📌');
-            header("Location: " . BASE_URL . "/ad/show/" . $ad_id);
+            header("Location: " . BASE_URL . "/index.php?url=ad/show/" . $ad_id);
             exit();
         }
+    }
+
+    // ==========================================================
+    // 🎭 SARRA: VOICI LA FONCTION MANQUANTE POUR L'AJAX !
+    // ==========================================================
+    public function vote($ad_id) {
+        // On dit au navigateur qu'on va lui répondre en langage "Robot" (JSON)
+        header('Content-Type: application/json');
+
+        if (!Session::isLoggedIn()) {
+            echo json_encode(['success' => false, 'message' => 'Connecte-toi pour voter !']);
+            exit();
+        }
+
+        $voteModel = new Vote();
+        $user_id = Auth::id();
+
+        // On utilise la méthode 'cast' de Fedi
+        $result = $voteModel->cast($ad_id, $user_id);
+
+        if ($result) {
+            // On récupère le nouveau score
+            $newScore = $voteModel->getCount($ad_id);
+            echo json_encode(['success' => true, 'new_score' => $newScore]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Tu as déjà voté !']);
+        }
+        exit();
     }
 }
