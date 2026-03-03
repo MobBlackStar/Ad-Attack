@@ -2,3 +2,7 @@ I accidentally, shoved the main i had locally into donyes's branch oopsie daisy,
 
 
 Just did forward integration, y'all will also, wait lemme write in the main 
+
+
+
+As of 3:33 03/03/26 the work is done, waiting further feature discussions, stay tunes
