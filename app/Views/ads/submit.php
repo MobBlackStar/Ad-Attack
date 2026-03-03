@@ -8,6 +8,8 @@
 
             <!-- TEAM: The Form uses the Master Router URL and enctype for files! -->
             <form action="<?= BASE_URL ?>/ad/store" method="POST" enctype="multipart/form-data" class="card bg-secondary p-4 shadow">
+                <!-- TEAM : On cache l'ID du défi ici pour que le contrôleur sache pour quel défi on poste -->
+    <input type="hidden" name="brief_id" value="<?= $brief_id ?>">
                 
                 <!-- SECURITY: Architect's CSRF Shield -->
                 <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::generateCSRF(); ?>">
@@ -34,6 +36,7 @@
                     </button>
                 </div>
             </form>
+            
 
             <div class="mt-4 text-center">
                 <a href="<?= BASE_URL ?>/brief" class="text-decoration-none text-muted">← Back to Briefs</a>

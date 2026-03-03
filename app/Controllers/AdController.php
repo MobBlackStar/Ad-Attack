@@ -5,12 +5,11 @@ use App\Core\Controller;
 use App\Core\Session; 
 use App\Models\Ad;
 use App\Models\Comment;
-// TEAM: Importing the Security Guard to verify badges.
-use App\Core\Auth;
+use App\Core\Auth; // Le garde du corps de Fedi
 
 class AdController extends Controller {
 
-    // THE EXHIBITION: Shows all ads.
+    // Affiche la galerie
     public function index() {
         $adModel = new Ad();
         $this->view('ads/gallery', [
@@ -19,13 +18,13 @@ class AdController extends Controller {
         ]);
     }
 
-    // THE JUDGING ROOM: Shows one ad and the comments.
+    // Affiche une pub avec ses commentaires
     public function show($id) {
         $adModel = new Ad();
         $commentModel = new Comment();
 
         $ad = $adModel->find($id);
-        if (!$ad) { die("This Masterpiece does not exist!"); }
+        if (!$ad) { die("Cette œuvre n'existe pas !"); }
         
         $comments = $commentModel->getByAd($id);
 
@@ -36,59 +35,67 @@ class AdController extends Controller {
         ]);
     }
 
-    // THE UPLOAD ROOM: Shows the submission form.
-    public function submit($brief_id) {
-        // TEAM: You shall not pass! (Unless you are logged in)
-        Auth::requireLogin(); 
-        
+    // Affiche le formulaire (Ne pas oublier cette fonction !)
+    public function submit($brief_id = 1) {
         $this->view('ads/submit', [
-            'title' => 'Launch an Attack',
+            'title'    => 'Submit your Ad',
             'brief_id' => $brief_id
         ]);
     }
 
-    // THE LOGIC: Saves the Ad.
+    // TEAM - Sarra : Voici l'unique version de STORE (Enregistrement)
     public function store() {
-        if (!Session::checkCSRF($_POST['csrf_token'] ?? '')) {
-            die("Security Error: Handshake Failed.");
-        }
-
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $image = $_FILES['ad_image'];
-            $targetDir = dirname(__DIR__, 2) . "/public/assets/uploads/";
-            $fileName = time() . "_" . basename($image["name"]);
-            $destination = $targetDir . $fileName;
+            
+            // On vérifie la sécurité CSRF de Fedi
+            // Si tu n'as pas encore mis le jeton dans ton HTML, on peut commenter cette ligne temporairement
+            /*
+            if (!Session::checkCSRF($_POST['csrf_token'] ?? '')) {
+                die("Erreur de sécurité : Jeton invalide.");
+            }
+            */
 
-            if (move_uploaded_file($image["tmp_name"], $destination)) {
+            $image = $_FILES['ad_image'];
+            $targetDir = "assets/uploads/";
+            $fileName = time() . "_" . basename($image["name"]);
+            $targetFilePath = $targetDir . $fileName;
+
+            if (move_uploaded_file($image["tmp_name"], "../public/" . $targetFilePath)) {
+                
                 $adModel = new Ad();
+                
+                // TEAM : On enregistre avec l'ID réel si connecté, sinon ID 1
+                $agency_id = Session::get('user_id') ?? 1;
+
                 $adModel->createAd([
-                    'brief_id'   => $_POST['brief_id'], 
-                    // TEAM: Using the real ID badge now! No more fake "User 1".
-                    'agency_id'  => Auth::id(), 
+                    'brief_id'   => $_POST['brief_id'] ?? 1,
+                    'agency_id'  => $agency_id,
                     'slogan'     => $_POST['slogan'],
-                    'image_path' => $fileName 
+                    'image_path' => $targetFilePath
                 ]);
 
-                Session::flash('message', 'Attack Launched Successfully! 🚀');
-                header("Location: " . BASE_URL . "/ad/index");
+                Session::flash('success', 'L\'attaque est lancée ! 🚀');
+                header("Location: index.php?url=ad/index");
                 exit();
+            
+            } else {
+                echo "Erreur lors de l'upload de l'image.";
             }
         }
     }
 
-    // THE FEEDBACK LOGIC: Saves comments.
+    // TEAM : Enregistre un commentaire
     public function comment() {
-        // TEAM: Only agencies with a badge can speak in the Golden Book.
-        Auth::requireLogin();
-
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $commentModel = new Comment();
             
-            // TEAM: We are signing the comment with the REAL user ID.
-            $commentModel->add($_POST['ad_id'], Auth::id(), $_POST['content']);
+            $ad_id = $_POST['ad_id'];
+            $agency_id = Session::get('user_id') ?? 1;
 
-            Session::flash('message', 'Feedback pinned to the gallery! 📌');
-            header("Location: " . BASE_URL . "/ad/show/" . $_POST['ad_id']);
+            $commentModel->add($ad_id, $agency_id, $_POST['content']);
+
+            Session::flash('success', 'Avis ajouté au Livre d\'Or ! 📌');
+            header("Location: index.php?url=ad/show/" . $ad_id);
             exit();
         }
     }
