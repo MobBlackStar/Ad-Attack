@@ -1,55 +1,81 @@
 <?php
 namespace App\Models;
-
 use App\Core\Model;
 
-// TEAM: Moataz here. This is our Warehouse Worker for challenges.
-// I've added functions to Edit, Delete, and Filter our data.
 class Brief extends Model {
-
-    // TEAM: Moataz - This is the "Trending" logic. 
-    // It sorts briefs by the total number of votes their ads have received.
-    public function findAllTrending() {
-        $sql = "SELECT b.*, COUNT(v.id) as vote_total 
-                FROM briefs b 
-                LEFT JOIN ads a ON b.id = a.brief_id 
-                LEFT JOIN votes v ON a.id = v.ad_id 
-                GROUP BY b.id 
-                ORDER BY vote_total DESC";
-        return $this->db->query($sql)->fetchAll();
-    }
-    
     protected $table = 'briefs';
 
-    // TEAM: Save a brand new challenge
     public function saveBrief($data) {
         $sql = "INSERT INTO briefs (agency_id, title, description, category, image, deadline) 
                 VALUES (:agency_id, :title, :description, :category, :image, :deadline)";
-        
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute($data);
+        return $this->db->prepare($sql)->execute($data);
     }
 
-    // TEAM: The Shredder - Delete a challenge from the cabinet
-    public function deleteBrief($id) {
-        $stmt = $this->db->prepare("DELETE FROM briefs WHERE id = :id");
-        return $stmt->execute(['id' => $id]);
-    }
-
-    // TEAM: The Update Logic - Modify an existing challenge
     public function updateBrief($id, $data) {
         $sql = "UPDATE briefs SET title = :title, description = :description, 
                 category = :category, deadline = :deadline WHERE id = :id";
-        
-        $data['id'] = $id; // Add the ID to our data package
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute($data);
+        $data['id'] = $id;
+        return $this->db->prepare($sql)->execute($data);
     }
 
-    // TEAM: The Filter - Grabs only the challenges from a specific category
-    public function findByCategory($category) {
-        $stmt = $this->db->prepare("SELECT * FROM briefs WHERE category = :cat ORDER BY id DESC");
-        $stmt->execute(['cat' => $category]);
+    // TEAM: Fedi - Added LIMIT and OFFSET for Dynamic Pagination!
+    public function getFilteredBriefs($category = 'All', $sort = 'newest', $keyword = '', $limit = 6, $offset = 0) {
+        $sql = "SELECT b.*, COUNT(v.id) as vote_count 
+                FROM briefs b 
+                LEFT JOIN ads a ON b.id = a.brief_id 
+                LEFT JOIN votes v ON a.id = v.ad_id";
+        
+        $params = [];
+        $conditions =[];
+
+        if ($category !== 'All' && !empty($category)) {
+            $conditions[] = "b.category = :cat";
+            $params['cat'] = $category;
+        }
+        if (!empty($keyword)) {
+            $conditions[] = "(b.title LIKE :key OR b.description LIKE :key)";
+            $params['key'] = "%$keyword%";
+        }
+        if (!empty($conditions)) {
+            $sql .= " WHERE " . implode(" AND ", $conditions);
+        }
+
+        $sql .= " GROUP BY b.id";
+
+        if ($sort === 'trending') {
+            $sql .= " ORDER BY vote_count DESC, b.id DESC";
+        } else {
+            $sql .= " ORDER BY b.id DESC";
+        }
+
+        // THE PAGINATION MAGIC
+        $sql .= " LIMIT " . (int)$limit . " OFFSET " . (int)$offset;
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll();
+    }
+
+    // TEAM: Fedi - We need to count how many total items exist so we know how many pages to draw!
+    public function getTotalFiltered($category = 'All', $keyword = '') {
+        $sql = "SELECT COUNT(*) as total FROM briefs";
+        $params =[];
+        $conditions = [];
+
+        if ($category !== 'All' && !empty($category)) {
+            $conditions[] = "category = :cat";
+            $params['cat'] = $category;
+        }
+        if (!empty($keyword)) {
+            $conditions[] = "(title LIKE :key OR description LIKE :key)";
+            $params['key'] = "%$keyword%";
+        }
+        if (!empty($conditions)) {
+            $sql .= " WHERE " . implode(" AND ", $conditions);
+        }
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetch()->total ?? 0;
     }
 }

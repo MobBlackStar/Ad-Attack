@@ -140,4 +140,34 @@ class AdController extends Controller {
         }
         exit();
     }
+
+    // TEAM: Sarra - Show the Edit Room
+    public function edit($id) {
+        \App\Core\Auth::requireLogin();
+        $model = new Ad();
+        $ad = $model->find($id);
+
+        // Security: Only the owner or Overlord can edit
+        if (!$ad || ($ad->agency_id != \App\Core\Auth::id() && \App\Core\Auth::id() != 1)) {
+            die("Security Error: You cannot paint over someone else's work.");
+        }
+
+        $this->view('ads/edit',[
+            'title' => 'Edit Masterpiece',
+            'ad' => $ad
+        ]);
+    }
+
+    // TEAM: Sarra - Save the new slogan
+    public function update($id) {
+        \App\Core\Auth::requireLogin();
+        if (!\App\Core\Session::checkCSRF($_POST['csrf_token'] ?? '')) die("CSRF Error");
+
+        $model = new Ad();
+        $model->updateSlogan($id, $_POST['slogan']);
+
+        \App\Core\Session::flash('message', 'Campaign Slogan Updated! ✍️');
+        header('Location: ' . BASE_URL . '/ad/show/' . $id);
+        exit();
+    }
 }

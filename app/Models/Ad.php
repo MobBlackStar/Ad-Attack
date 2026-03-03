@@ -44,4 +44,11 @@ class Ad extends Model {
         $stmt->execute(['id' => $brief_id]);
         return $stmt->fetchAll();
     }
+    
+    // TEAM: Sarra - Let the artist fix their typos!
+    public function updateSlogan($id, $slogan) {
+        $sql = "UPDATE ads SET slogan = :slogan WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute(['slogan' => $slogan, 'id' => $id]);
+    }
 }

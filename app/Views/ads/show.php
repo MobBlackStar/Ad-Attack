@@ -15,8 +15,23 @@
                         <h2 class="text-warning fw-bold italic">"<?= htmlspecialchars($ad->slogan) ?>"</h2>
                         <!-- FIX: Now shows the REAL name instead of just #1 -->
                         <p class="text-info">Exhibited by: <strong class="text-white"><?= htmlspecialchars($ad->agency_name ?? 'Agency #'.$ad->agency_id) ?></strong></p>
+                        
                         <hr class="border-secondary">
-                        <a href="<?= BASE_URL ?>/ad/index" class="btn btn-outline-light btn-sm">← Return to Exhibition</a>
+                        <a href="<?= BASE_URL ?>/ad/index" class="btn btn-outline-light btn-sm mb-3">← Return to Exhibition</a>
+
+                        <!-- TEAM: SARRA'S EDIT/DELETE BUTTONS (Requirement 3C) -->
+                        <!-- SECURITY: Only the owner (or the Admin ID 1) can see these buttons -->
+                        <?php if(\App\Core\Session::isLoggedIn() && ($ad->agency_id == \App\Core\Auth::id() || \App\Core\Auth::id() == 1)): ?>
+                            <div class="d-flex gap-2 border-top border-dark pt-3 mt-1">
+                                <a href="<?= BASE_URL ?>/ad/edit/<?= $ad->id ?>" class="btn btn-sm btn-info w-50 fw-bold shadow-sm">
+                                    ✏️ Edit Slogan
+                                </a>
+                                <a href="<?= BASE_URL ?>/ad/delete/<?= $ad->id ?>" class="btn btn-sm btn-danger w-50 fw-bold shadow-sm" onclick="return confirm('Team: Are you sure you want to SHRED this masterpiece? It cannot be undone!');">
+                                    🗑️ Shred Ad
+                                </a>
+                            </div>
+                        <?php endif; ?>
+                        
                     </div>
                 </div>
             </div>
