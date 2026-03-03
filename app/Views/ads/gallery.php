@@ -42,6 +42,20 @@
                                     <a href="index.php?url=ad/show/<?= $ad->id ?>" class="btn btn-warning w-100 fw-bold py-2">
                                         VIEW & JUDGE
                                     </a>
+                                    <!-- 🎭 BLIND VOTING SECTION -->
+                                    <!-- bouton blind voting -->
+                                    <!-- Fedi: I added the 'vote-btn' class for your AJAX magic! -->
+                                    <div class="p-2 bg-dark rounded-pill border border-warning mb-2">
+                                        <small class="text-white">
+                                            Score : 
+                                            <span id="score-<?= $ad->id ?>" class="text-warning fw-bold">
+                                                <span style="filter: blur(5px);">88</span>
+                                            </span>
+                                        </small>
+                                    </div>
+                                     <button class="btn btn-sm btn-outline-warning w-100 vote-btn" data-id="<?= $ad->id ?>">
+                                        VOTE TO REVEAL
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -60,3 +74,5 @@
 
 </body>
 </html>
+<!-- TEAM - Sarra : Je connecte officiellement le script AJAX de Fedi ! -->
+<script src="<?= BASE_URL ?>/assets/js/app.js"></script>
