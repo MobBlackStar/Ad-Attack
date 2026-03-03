@@ -52,7 +52,9 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> <?php if($ad->agency_id == \App\Core\Auth::id() || \App\Core\Auth::id() == 1): ?>
+    <a href="<?= BASE_URL ?>/ad/delete/<?= $ad->id ?>" class="btn btn-sm btn-outline-danger mt-2" onclick="return confirm('Team: Burn this masterpiece?');">Shred Ad</a>
+<?php endif; ?>
             <?php endforeach; ?>
 
         <?php endif; ?>

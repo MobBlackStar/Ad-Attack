@@ -26,6 +26,18 @@ class Ad extends Model {
         return $stmt->fetch();
     }
 
+    // TEAM: Sarra/Fedi - This grabs all Ads for a specific mission and identifies the artists!
+    public function getByBriefWithAgency($brief_id) {
+        $sql = "SELECT ads.*, agencies.name as agency_name 
+                FROM ads 
+                JOIN agencies ON ads.agency_id = agencies.id 
+                WHERE ads.brief_id = :id 
+                ORDER BY ads.created_at DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['id' => $brief_id]);
+        return $stmt->fetchAll();
+    }
+
     public function getByBrief($brief_id) {
         $sql = "SELECT * FROM ads WHERE brief_id = :id";
         $stmt = $this->db->prepare($sql);

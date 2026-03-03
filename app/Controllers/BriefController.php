@@ -13,21 +13,18 @@ class BriefController extends Controller {
     // Fedi here, uh we had a bug and its fixed now
     public function index() {
         $model = new Brief();
-        
-        // We catch the category from the URL (e.g. /brief/index?category=Tech)
-        $category = $_GET['category'] ?? 'All';
+        $sort = $_GET['sort'] ?? 'newest'; // TEAM: Default to newest
 
-        // The Warehouse Worker (Model) decides what to bring out based on the filter
-        if ($category !== 'All') {
-            $allBriefs = $model->findByCategory($category);
+        if ($sort == 'trending') {
+            $briefs = $model->findAllTrending();
         } else {
-            $allBriefs = $model->findAll();
+            $briefs = $model->findAll(); // Assuming findAll sorts by date desc
         }
     
         $this->view('briefs/index', [
-            'title'  => 'Ad-Attack | Briefing Room',
-            'briefs' => $allBriefs,
-            'currentCategory' => $category
+            'title'  => 'Briefing Room',
+            'briefs' => $briefs,
+            'currentSort' => $sort
         ]);
     }
 
@@ -74,11 +71,20 @@ class BriefController extends Controller {
         $brief = $model->find($id);
         if (!$brief) { die("This brief has been shredded or never existed."); }
 
-        $adModel = new Ad(); // Fedi: Cleaned this up to use the import at the top
+        // TEAM: Architect Magic - Pulling the Ads and checking the Voting status
+        $adModel = new Ad(); 
+        $voteModel = new \App\Models\Vote();
+        $ads = $adModel->getByBriefWithAgency($id);
+
+        foreach ($ads as $ad) {
+            $ad->vote_count = $voteModel->getCount($ad->id);
+            $ad->has_voted = Session::isLoggedIn() ? $voteModel->hasVoted($ad->id, Auth::id()) : false;
+        }
+
         $this->view('briefs/show', [
             'title' => $brief->title,
             'brief' => $brief,
-            'ads'   => $adModel->getByBrief($id) // Fedi's glue logic
+            'ads'   => $ads // Fedi's glue logic
         ]);
     }
 

@@ -5,6 +5,25 @@ use App\Core\Model;
 // TEAM: Donyes's Worker for the 'agencies' table.
 // I've trained this worker to handle all our Agency paperwork
 class Agency extends Model {
+
+    // TEAM: Fedi - This finds the Top 3 Agencies for the Hall of Fame.
+    // It sums up all votes received on all ads for each agency.
+    public function getLeaderboard() {
+        $sql = "SELECT a.id, a.name, COUNT(v.id) as total_qi 
+                FROM agencies a
+                LEFT JOIN ads ad ON a.id = ad.agency_id
+                LEFT JOIN votes v ON ad.id = v.ad_id
+                GROUP BY a.id
+                ORDER BY total_qi DESC
+                LIMIT 3";
+        $topAgencies = $this->db->query($sql)->fetchAll();
+        
+        // Architect Magic: Attach their Cultivation Rank to each name
+        foreach($topAgencies as $agency) {
+            $agency->status = $this->getCultivationRank($agency->id);
+        }
+        return $topAgencies;
+    }
     
     protected $table = 'agencies';
 

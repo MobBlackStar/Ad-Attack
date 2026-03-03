@@ -6,6 +6,18 @@ use App\Core\Model;
 // TEAM: Moataz here. This is our Warehouse Worker for challenges.
 // I've added functions to Edit, Delete, and Filter our data.
 class Brief extends Model {
+
+    // TEAM: Moataz - This is the "Trending" logic. 
+    // It sorts briefs by the total number of votes their ads have received.
+    public function findAllTrending() {
+        $sql = "SELECT b.*, COUNT(v.id) as vote_total 
+                FROM briefs b 
+                LEFT JOIN ads a ON b.id = a.brief_id 
+                LEFT JOIN votes v ON a.id = v.ad_id 
+                GROUP BY b.id 
+                ORDER BY vote_total DESC";
+        return $this->db->query($sql)->fetchAll();
+    }
     
     protected $table = 'briefs';
 

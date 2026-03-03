@@ -8,6 +8,11 @@
     </div>
 
     <!-- TEAM: The Category Filter -->
+
+    <div class="mb-4">
+    <a href="<?= BASE_URL ?>/brief?sort=newest" class="btn btn-sm <?= ($currentSort == 'newest') ? 'btn-warning' : 'btn-outline-warning' ?>">Newest</a>
+    <a href="<?= BASE_URL ?>/brief?sort=trending" class="btn btn-sm <?= ($currentSort == 'trending') ? 'btn-warning' : 'btn-outline-warning' ?>">🔥 Trending</a>
+</div>
     <form action="<?= BASE_URL ?>/brief" method="GET" class="row g-2 mb-5 bg-secondary p-3 rounded shadow-sm">
         <div class="col-md-3">
             <select name="category" class="form-select bg-dark text-white border-0">

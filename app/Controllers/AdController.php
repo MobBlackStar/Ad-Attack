@@ -10,6 +10,21 @@ use App\Core\Auth;
 
 class AdController extends Controller {
 
+    // TEAM: Sarra - The Ad Shredder. 
+    // Only the artist who made the Ad (or the Overlord) can delete it.
+    public function delete($id) {
+        \App\Core\Auth::requireLogin();
+        $model = new Ad();
+        $ad = $model->find($id);
+
+        if ($ad && ($ad->agency_id == \App\Core\Auth::id() || \App\Core\Auth::id() == 1)) {
+            $model->delete($id);
+            \App\Core\Session::flash('message', 'Masterpiece removed from gallery.');
+        }
+        header('Location: ' . BASE_URL . '/ad/index');
+        exit();
+    }
+
     // THE EXHIBITION: Shows all ads with Blind Voting logic
     public function index() {
         $adModel = new Ad();
