@@ -3,12 +3,14 @@ namespace App\Models;
 use App\Core\Model;
 
 // TEAM: Donyes's Worker for the 'agencies' table.
+// I've trained this worker to handle all our Agency paperwork
 class Agency extends Model {
     
     protected $table = 'agencies';
 
+    // RITEJ: Saves a new agency with a hashed password
     public function register($name, $email, $password) {
-        // SECURITY: Hashing the password (15% Grade Requirement)
+        // SECURITY: Hashing the password 
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
         $sql = "INSERT INTO {$this->table} (name, email, password) VALUES (:name, :email, :password)";
@@ -21,6 +23,7 @@ class Agency extends Model {
         ]);
     }
 
+    // RITEJ: The Detective. Searches the warehouse for a specific email.
     public function findByEmail($email) {
         $sql = "SELECT * FROM {$this->table} WHERE email = :email LIMIT 1";
         $stmt = $this->db->prepare($sql);
@@ -28,10 +31,21 @@ class Agency extends Model {
         return $stmt->fetch(); 
     }
 
-    // THE MARTIAL PEAK ENGINE (Architect's Gamification)
-    
+    // RITEJ: The Eraser. Updates the name on the agency folder.
+    // TEAM: Use this for the "Modification du Profil" requirement
+    public function updateName($id, $newName) {
+        $sql = "UPDATE {$this->table} SET name = :name WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            'name' => $newName,
+            'id' => $id
+        ]);
+    }
+
+    // ---------------------------------------------------------
+    // FEDI'S MARTIAL PEAK ENGINE (Architect's Gamification)
+    // ---------------------------------------------------------
     public function getCultivationRank($agency_id) {
-        // 1. Calculate the total "Qi" (Votes received on all ads)
         $sql = "SELECT COUNT(v.id) as qi 
                 FROM votes v 
                 JOIN ads a ON v.ad_id = a.id 
@@ -41,13 +55,12 @@ class Agency extends Model {
         $stmt->execute(['id' => $agency_id]);
         $qi = $stmt->fetch()->qi ?? 0;
 
-        // 2. Determine the Realm based on Qi
-        if ($qi >= 100) return ['rank' => '🌌 Open Heaven', 'color' => 'badge bg-warning text-dark border border-white']; // God Tier
-        if ($qi >= 50)  return ['rank' => '👑 Emperor Realm',       'color' => 'badge bg-danger'];  // High Tier
-        if ($qi >= 30)  return ['rank' => '⚔️ Dao Source',          'color' => 'badge bg-info text-dark'];
-        if ($qi >= 15)  return ['rank' => '🛡️ Saint Realm',         'color' => 'badge bg-primary'];
+        if ($qi >= 100) return['rank' => '🌌 Open Heaven Rank 9', 'color' => 'badge bg-warning text-dark border border-white'];
+        if ($qi >= 50)  return['rank' => '👑 Emperor Realm',       'color' => 'badge bg-danger'];
+        if ($qi >= 30)  return['rank' => '⚔️ Dao Source',          'color' => 'badge bg-info text-dark'];
+        if ($qi >= 15)  return['rank' => '🛡️ Saint Realm',         'color' => 'badge bg-primary'];
         if ($qi >= 5)   return ['rank' => '⚡ Immortal Ascension',  'color' => 'badge bg-success'];
         
-        return ['rank' => '🧱 Tempered Body', 'color' => 'badge bg-secondary']; // The beginning
+        return ['rank' => '🧱 Tempered Body', 'color' => 'badge bg-secondary'];
     }
 }
