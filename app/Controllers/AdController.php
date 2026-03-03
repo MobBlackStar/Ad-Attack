@@ -5,27 +5,43 @@ use App\Core\Controller;
 use App\Core\Session; 
 use App\Models\Ad;
 use App\Models\Comment;
-use App\Core\Auth; // Le garde du corps de Fedi
+use App\Models\Vote; // TEAM: Make sure we invite the Vote worker to the meeting!
+use App\Core\Auth; 
 
 class AdController extends Controller {
 
-    // Affiche la galerie
+    // THE EXHIBITION: Shows all ads with Blind Voting logic
     public function index() {
         $adModel = new Ad();
+        $voteModel = new Vote(); 
+        
+        $allAds = $adModel->findAll();
+
+        // TEAM: Architect logic to check if user has already voted for each ad
+        foreach ($allAds as $ad) {
+            $ad->vote_count = $voteModel->getCount($ad->id);
+            $ad->has_voted = Session::isLoggedIn() ? $voteModel->hasVoted($ad->id, Auth::id()) : false;
+        }
+
         $this->view('ads/gallery', [
             'title' => 'Ad-Attack | The Gallery',
-            'ads'   => $adModel->findAll()
+            'ads'   => $allAds
         ]);
     }
 
-    // Affiche une pub avec ses commentaires
+    // THE JUDGING ROOM: Shows one ad, its comments, and its vote status
     public function show($id) {
         $adModel = new Ad();
         $commentModel = new Comment();
+        $voteModel = new Vote();
 
         $ad = $adModel->find($id);
         if (!$ad) { die("Cette œuvre n'existe pas !"); }
         
+        // Add voting data to the specific Ad object
+        $ad->vote_count = $voteModel->getCount($ad->id);
+        $ad->has_voted = Session::isLoggedIn() ? $voteModel->hasVoted($ad->id, Auth::id()) : false;
+
         $comments = $commentModel->getByAd($id);
 
         $this->view('ads/show', [
@@ -35,7 +51,7 @@ class AdController extends Controller {
         ]);
     }
 
-    // Affiche le formulaire (Ne pas oublier cette fonction !)
+    // Affiche le formulaire
     public function submit($brief_id = 1) {
         $this->view('ads/submit', [
             'title'    => 'Submit your Ad',
@@ -43,28 +59,15 @@ class AdController extends Controller {
         ]);
     }
 
-    // TEAM - Sarra : Voici l'unique version de STORE (Enregistrement)
     public function store() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            
-            // On vérifie la sécurité CSRF de Fedi
-            // Si tu n'as pas encore mis le jeton dans ton HTML, on peut commenter cette ligne temporairement
-            /*
-            if (!Session::checkCSRF($_POST['csrf_token'] ?? '')) {
-                die("Erreur de sécurité : Jeton invalide.");
-            }
-            */
-
             $image = $_FILES['ad_image'];
             $targetDir = "assets/uploads/";
             $fileName = time() . "_" . basename($image["name"]);
             $targetFilePath = $targetDir . $fileName;
 
             if (move_uploaded_file($image["tmp_name"], "../public/" . $targetFilePath)) {
-                
                 $adModel = new Ad();
-                
-                // TEAM : On enregistre avec l'ID réel si connecté, sinon ID 1
                 $agency_id = Session::get('user_id') ?? 1;
 
                 $adModel->createAd([
@@ -75,27 +78,23 @@ class AdController extends Controller {
                 ]);
 
                 Session::flash('success', 'L\'attaque est lancée ! 🚀');
-                header("Location: index.php?url=ad/index");
+                header("Location: " . BASE_URL . "/ad/index");
                 exit();
-            
             } else {
                 echo "Erreur lors de l'upload de l'image.";
             }
         }
     }
 
-    // TEAM : Enregistre un commentaire
     public function comment() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $commentModel = new Comment();
-            
             $ad_id = $_POST['ad_id'];
             $agency_id = Session::get('user_id') ?? 1;
-
             $commentModel->add($ad_id, $agency_id, $_POST['content']);
 
             Session::flash('success', 'Avis ajouté au Livre d\'Or ! 📌');
-            header("Location: index.php?url=ad/show/" . $ad_id);
+            header("Location: " . BASE_URL . "/ad/show/" . $ad_id);
             exit();
         }
     }

@@ -4,44 +4,30 @@
     <div class="row justify-content-center">
         <div class="col-md-6">
             
-            <h2 class="text-warning text-center mb-4">🎨 Launch an Ad-Attack</h2>
+            <h2 class="text-warning text-center mb-4 fw-bold">🎨 LAUNCH AN AD-ATTACK</h2>
 
-            <!-- TEAM: The Form uses the Master Router URL and enctype for files! -->
-            <form action="<?= BASE_URL ?>/ad/store" method="POST" enctype="multipart/form-data" class="card bg-secondary p-4 shadow">
-                <!-- TEAM : On cache l'ID du défi ici pour que le contrôleur sache pour quel défi on poste -->
-    <input type="hidden" name="brief_id" value="<?= $brief_id ?>">
-                
-                <!-- SECURITY: Architect's CSRF Shield -->
-                <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::generateCSRF(); ?>">
-                <!-- We need to know WHICH brief we are answering -->
+            <form action="<?= BASE_URL ?>/ad/store" method="POST" enctype="multipart/form-data" class="card bg-secondary p-4 shadow-lg border-0">
                 <input type="hidden" name="brief_id" value="<?= $brief_id ?>">
+                <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::generateCSRF(); ?>">
 
                 <div class="mb-4">
                     <label class="form-label fw-bold">1. Your Killer Slogan</label>
-                    <input type="text" name="slogan" class="form-control" placeholder="e.g. A brick for the future." required>
-                    <small class="text-info">Make it punchy!</small>
+                    <input type="text" name="slogan" class="form-control bg-dark text-white border-0" placeholder="e.g. A brick for the future." required>
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label fw-bold">2. Your Photoshopped Masterpiece</label>
-                    <input type="file" name="ad_image" class="form-control" accept="image/*" required>
-                    <small class="text-info">JPG or PNG formats only.</small>
+                    <label class="form-label fw-bold">2. Your Masterpiece (Image)</label>
+                    <input type="file" name="ad_image" class="form-control bg-dark text-white border-0" accept="image/*" required>
                 </div>
 
-                <hr>
-
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-warning btn-lg fw-bold">
-                        SUBMIT AD 🚀
-                    </button>
-                </div>
+                <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold rounded-pill">
+                    SUBMIT TO GALLERY 🚀
+                </button>
             </form>
             
-
             <div class="mt-4 text-center">
                 <a href="<?= BASE_URL ?>/brief" class="text-decoration-none text-muted">← Back to Briefs</a>
             </div>
-
         </div>
     </div>
 </div>
