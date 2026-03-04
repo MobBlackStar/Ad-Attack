@@ -10,7 +10,7 @@
                     <p class="text-light opacity-75">Forge your Agency Identity </p>
                 </div>
                   <?php $error = \App\Core\Session::flash('error'); ?>
-      <!--  ZONE D'AFFICHAGE DES ERREURS -->
+                 <!--  ZONE D'AFFICHAGE DES ERREURS -->
                     <!-- s'affichera "Password too weak" ou "Email taken" -->
                 <?php if($error): ?>
                     <div class="alert alert-danger text-center fw-bold shadow-sm mb-4">
@@ -20,9 +20,6 @@
 
                 <form action="<?= BASE_URL ?>/auth/store" method="POST">
                     <!-- securité : CSFR -->
-
-              
-
                     <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::generateCSRF(); ?>">
                     
                     <div class="form-floating mb-3 text-dark">
@@ -40,6 +37,12 @@
                         <label for="passwordInput">Secret password</label>
                         <small class="text-muted d-block mt-1" style="font-size: 0.8rem;">
 Must contain: 8 chars, 1 Uppercase, 1 Number, 1 Symbol
+<!-- LA DOUBLE SERRURE (Confirmation du mot de passe) -->
+<div class="form-floating mb-4 text-dark">
+    <!-- Attention au name="confirm_password", c'est ce que le Manager cherche ! -->
+    <input type="password" class="form-control fw-bold border-warning" id="confirmPasswordInput" name="confirm_password" placeholder="Confirm password" required>
+    <label for="confirmPasswordInput">Confirm secret password</label>
+</div>
                     </div>
                     
                     <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold rounded-pill shadow-sm">

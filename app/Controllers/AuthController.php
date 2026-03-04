@@ -21,8 +21,15 @@ class AuthController extends Controller {
         $name = trim($_POST['name']);
         $email = trim($_POST['email']);
         $password = $_POST['password'];
+        $confirm_password = $_POST['confirm_password'];
 
         // --- THE BOUNCER (Security Logic) ---
+        // LE TEST DU MIROIR (Double Lock)
+        if ($password !== $confirm_password) {
+            Session::flash('error', 'Oups ! Les deux mots de passe ne sont pas identiques.');
+            header('Location: ' . BASE_URL . '/auth/register');
+            exit();
+        }
         if (strlen($password) < 8) {
             Session::flash('error', 'Le mot de passe est trop court !');
             header('Location: ' . BASE_URL . '/auth/register');
