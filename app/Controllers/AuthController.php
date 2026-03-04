@@ -31,13 +31,13 @@ class AuthController extends Controller {
             exit();
         }
         if (strlen($password) < 8) {
-            Session::flash('error', 'Le mot de passe est trop court !');
+            Session::flash('message', 'Le mot de passe est trop court !');
             header('Location: ' . BASE_URL . '/auth/register');
             exit();
         }
 
         if (!preg_match('/[A-Z]/', $password) || !preg_match('/[0-9]/', $password) || !preg_match('/[^a-zA-Z0-9]/', $password)) {
-            Session::flash('error', 'Le mot de passe doit être complexe (Majuscule, Chiffre, Symbole).');
+            Session::flash('message', 'Le mot de passe doit être complexe (Majuscule, Chiffre, Symbole).');
             header('Location: ' . BASE_URL . '/auth/register');
             exit();
         }
@@ -50,7 +50,7 @@ class AuthController extends Controller {
 
         // Check if email is already taken
         if ($agencyModel->findByEmail($email)) {
-            Session::flash('error', 'Cet email est déjà utilisé !');
+            Session::flash('message', 'Cet email est déjà utilisé !');
             header('Location: ' . BASE_URL . '/auth/register');
             exit();
         }
@@ -116,9 +116,9 @@ class AuthController extends Controller {
         ]);
     }
 
-    // RITEJ: Renamed from 'updateProfile' to 'update' to match the URL
+    // ARCHITECT FIX: Changed the name back to 'updateProfile' to match the HTML form action!
     // TEAM: This handles the "Rename Agency" form.
-    public function update() {
+    public function updateProfile() {
         Auth::requireLogin();
 
         if (!Session::checkCSRF($_POST['csrf_token'] ?? '')) {

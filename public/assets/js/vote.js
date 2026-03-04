@@ -17,7 +17,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Send a secret "Fetch" request to our PHP Controller
             // Note: We use the BASE_URL logic via a relative path
-            fetch("/vote/cast", {
+           // TEAM - Sarra: I updated the fetch path to work on WAMP Localhost!
+            // We must route it through index.php
+            fetch("index.php?url=vote/cast", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
