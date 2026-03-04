@@ -28,17 +28,17 @@ class AdController extends Controller {
     // THE EXHIBITION: Shows all ads with Blind Voting logic
     public function index() {
         $adModel = new Ad();
-        $voteModel = new Vote(); 
+        $voteModel = new \App\Models\Vote(); 
         
-        $allAds = $adModel->findAll();
+        // ARCHITECT FIX: Use the new method to grab names!
+        $allAds = $adModel->getAllWithAgency();
 
-        // TEAM: Architect logic to check if user has already voted for each ad
         foreach ($allAds as $ad) {
             $ad->vote_count = $voteModel->getCount($ad->id);
             $ad->has_voted = Session::isLoggedIn() ? $voteModel->hasVoted($ad->id, Auth::id()) : false;
         }
 
-        $this->view('ads/gallery', [
+        $this->view('ads/gallery',[
             'title' => 'Ad-Attack | The Gallery',
             'ads'   => $allAds
         ]);

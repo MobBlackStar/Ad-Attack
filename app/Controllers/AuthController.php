@@ -92,16 +92,20 @@ class AuthController extends Controller {
         exit();
     }
     
-    // --- PROFILE ROOMS ---
-
+    // TEAM: The Locker Room
     public function profile() {
         Auth::requireLogin();
-        $agencyModel = new Agency();
-        $user = $agencyModel->find(Auth::id());
+        
+        $model = new Agency();
+        $user = $model->find(Auth::id());
+        
+        // ARCHITECT FIX: Grab the Cultivation Rank from the Model!
+        $cultivation = $model->getCultivationRank(Auth::id());
 
-        $this->view('auth/profile', [
-            'title' => 'Mon Agence',
-            'user' => $user
+        $this->view('auth/profile',[
+            'title' => 'System Profile',
+            'user' => $user,
+            'cultivation' => $cultivation // Handing it to the View
         ]);
     }
 

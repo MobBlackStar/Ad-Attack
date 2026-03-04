@@ -58,4 +58,13 @@ class Ad extends Model {
         $stmt = $this->db->prepare($sql);
         return $stmt->execute(['slogan' => $slogan, 'id' => $id]);
     }
+
+    // TEAM: Fedi - Added a JOIN so the Main Gallery shows REAL names, not "Unknown".
+    public function getAllWithAgency() {
+        $sql = "SELECT ads.*, agencies.name as agency_name 
+                FROM ads 
+                LEFT JOIN agencies ON ads.agency_id = agencies.id 
+                ORDER BY ads.created_at DESC";
+        return $this->db->query($sql)->fetchAll();
+    }
 }
