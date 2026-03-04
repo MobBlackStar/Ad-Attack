@@ -1,70 +1,84 @@
-<?php 
-// TEAM: We load the Master Header for the Dark Mode theme and Navbar.
-require '../app/Views/partials/header.php'; 
-?>
+<?php require '../app/Views/partials/header.php'; ?>
 
 <div class="container mt-5">
     <div class="text-center mb-5">
-        <h1 class="display-2 text-warning fw-bold">AD-ATTACK</h1>
-        <p class="lead text-info font-monospace">The Digital Colosseum of Guerrilla Marketing</p>
+        <h1 class="display-1 fw-bold text-white" style="text-shadow: 0 0 20px #00f0ff;">AD-ATTACK</h1>
+        <p class="lead text-info font-monospace tracking-widest">
+            SYSTEM STATUS: <span class="text-success fw-bold">ONLINE</span>
+        </p>
     </div>
 
     <div class="row g-4">
-        <!-- ARENA STATUS -->
+        <!-- SYSTEM LOG (Left Column) -->
         <div class="col-md-8">
-            <div class="card bg-secondary text-white border-0 shadow-lg h-100" style="border-radius: 20px;">
-                <div class="card-body p-5">
-                    <h3 class="text-warning fw-bold mb-4">🔥 ARENA STATUS: OPERATIONAL</h3>
-                    <p class="mb-4">The factory engine is running at 100% capacity. Agencies are currently competing to ascend the Martial Peak through creative warfare.</p>
+            <div class="card bg-dark border-info h-100 shadow-lg" style="border-width: 1px; box-shadow: 0 0 25px rgba(0, 240, 255, 0.1);">
+                <div class="card-header bg-transparent border-info text-info font-monospace p-3">
+                    > root@ad-attack:~$ status_check --full
+                </div>
+                <div class="card-body p-4 text-light font-monospace">
+                    <p class="mb-2"><span class="text-success">✔</span> Protocol [MVC_ENGINE] ......... <span class="text-secondary">ACTIVE</span></p>
+                    <p class="mb-2"><span class="text-success">✔</span> Module [AUTH_GUARD] ........... <span class="text-secondary">SECURED</span></p>
+                    <p class="mb-2"><span class="text-success">✔</span> Module [BLIND_VOTE] ........... <span class="text-secondary">LISTENING</span></p>
+                    <p class="mb-4"><span class="text-success">✔</span> Module [CULTIVATION] .......... <span class="text-secondary">RANKING</span></p>
                     
-                    <div class="bg-dark p-4 rounded border-start border-warning border-4 mb-4">
-                        <h6 class="text-info text-uppercase small">Architect's Log: Phase 4</h6>
-                        <ul class="list-unstyled mb-0 small mt-2">
-                            <li class="mb-2">✅ <strong>Security:</strong> CSRF Handshakes and XSS Shields active.</li>
-                            <li class="mb-2">✅ <strong>Logic:</strong> AJAX Instant Voting & Blind Scoring deployed.</li>
-                            <li class="mb-0">✅ <strong>Lore:</strong> Martial Peak Cultivation System integrated.</li>
-                        </ul>
-                    </div>
-
-                    <div class="d-flex gap-3">
-                        <a href="<?= BASE_URL ?>/brief" class="btn btn-warning btn-lg fw-bold px-4 shadow">🎯 BROWSE BRIEFS</a>
-                        <a href="<?= BASE_URL ?>/ad" class="btn btn-outline-light btn-lg px-4">🖼️ VIEW GALLERY</a>
+                    <hr class="border-secondary opacity-25">
+                    
+                    <p class="text-warning">>> INCOMING TRANSMISSION: The arena is open. Agencies are competing for the Open Heaven Realm.</p>
+                    
+                    <div class="mt-4 d-flex gap-3">
+                        <a href="<?= BASE_URL ?>/brief" class="btn btn-warning fw-bold px-4 w-50">ACQUIRE TARGET</a>
+                        <a href="<?= BASE_URL ?>/ad" class="btn btn-outline-info px-4 w-50">VIEW WARFARE</a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- CULTIVATION LORE (Explain the Ranks to the Prof) -->
+        <!-- RANKING LORE (Right Column) -->
         <div class="col-md-4">
-            <div class="card bg-dark border-secondary text-white shadow-lg h-100" style="border-radius: 20px;">
-                <div class="card-body">
-                    <h5 class="text-warning fw-bold border-bottom border-secondary pb-2 mb-3">RANKING SYSTEM</h5>
-                    <div class="small">
-                        <p class="mb-2"><span class="badge bg-warning text-dark me-2">Open Heaven</span> Master of the Dao.</p>
-                        <p class="mb-2"><span class="badge bg-danger me-2">Emperor</span> Peak of Marketing.</p>
-                        <p class="mb-2"><span class="badge bg-info text-dark me-2">Dao Source</span> Skilled Strategist.</p>
-                        <p class="mb-2"><span class="badge bg-primary me-2">Saint</span> Proven Creative.</p>
-                        <p class="mb-2"><span class="badge bg-success me-2">Immortal</span> Rising Talent.</p>
-                        <p class="mb-0"><span class="badge bg-secondary me-2">Tempered</span> New Recruit.</p>
-                    </div>
-                    <hr class="border-secondary">
-                    <p class="text-muted extra-small">Note: Rank is calculated based on total Qi (Votes) received in the Exhibition.</p>
+            <div class="card bg-dark border-secondary h-100 shadow-lg">
+                <div class="card-header bg-transparent border-secondary text-warning fw-bold text-center">
+                    CULTIVATION REALMS
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item bg-dark text-white border-secondary d-flex justify-content-between">
+                            <span class="badge bg-warning text-dark">Open Heaven</span> <small class="text-muted">100+ Qi</small>
+                        </li>
+                        <li class="list-group-item bg-dark text-white border-secondary d-flex justify-content-between">
+                            <span class="badge bg-danger">Emperor</span> <small class="text-muted">50+ Qi</small>
+                        </li>
+                        <li class="list-group-item bg-dark text-white border-secondary d-flex justify-content-between">
+                            <span class="badge bg-info text-dark">Dao Source</span> <small class="text-muted">30+ Qi</small>
+                        </li>
+                        <li class="list-group-item bg-dark text-white border-secondary d-flex justify-content-between">
+                            <span class="badge bg-primary">Saint</span> <small class="text-muted">15+ Qi</small>
+                        </li>
+                        <li class="list-group-item bg-dark text-white border-secondary d-flex justify-content-between">
+                            <span class="badge bg-success">Immortal</span> <small class="text-muted">5+ Qi</small>
+                        </li>
+                        <li class="list-group-item bg-dark text-white border-secondary d-flex justify-content-between">
+                            <span class="badge bg-secondary">Tempered</span> <small class="text-muted">0 Qi</small>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
 
-        <!-- TOP CULTIVATORS (Mini Leaderboard) -->
+        <!-- TOP CULTIVATORS (Full Width) -->
         <div class="col-12 mt-4">
-            <h3 class="text-center text-warning mb-4 font-monospace">🏆 CURRENT APEX LEADERS</h3>
+            <h4 class="text-center text-warning mb-4 font-monospace">🏆 CURRENT APEX LEADERS</h4>
             <div class="row">
                 <?php if(!empty($topAgencies)): ?>
                     <?php foreach($topAgencies as $top): ?>
                         <div class="col-md-4">
-                            <div class="card bg-secondary border-0 shadow-sm text-center">
+                            <div class="card bg-dark border-warning shadow-sm text-center p-3 h-100" style="border-width: 2px;">
                                 <div class="card-body">
-                                    <h5 class="text-white mb-1"><?= htmlspecialchars($top->name) ?></h5>
-                                    <span class="<?= $top->status['color'] ?> shadow-sm"><?= $top->status['rank'] ?></span>
-                                    <p class="mt-2 text-info small mb-0"><?= $top->total_qi ?> Total Qi</p>
+                                    <h3 class="text-white mb-1"><?= htmlspecialchars($top->name) ?></h3>
+                                    <div class="mt-2">
+                                        <span class="<?= $top->status['color'] ?> shadow-sm"><?= $top->status['rank'] ?></span>
+                                    </div>
+                                    <p class="mt-3 text-info fw-bold mb-0 display-6"><?= $top->total_qi ?></p>
+                                    <small class="text-muted">Total Qi Accumulated</small>
                                 </div>
                             </div>
                         </div>

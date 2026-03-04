@@ -83,7 +83,10 @@ class BriefController extends Controller {
 
         $adModel = new Ad(); 
         $voteModel = new \App\Models\Vote();
-        $ads = $adModel->getByBriefWithAgency($id);
+        
+        // Catch the sort method from the URL
+        $sort = $_GET['sort'] ?? 'newest';
+        $ads = $adModel->getByBriefWithAgency($id, $sort);
 
         foreach ($ads as $ad) {
             $ad->vote_count = $voteModel->getCount($ad->id);
@@ -93,7 +96,8 @@ class BriefController extends Controller {
         $this->view('briefs/show',[
             'title' => $brief->title,
             'brief' => $brief,
-            'ads'   => $ads 
+            'ads'   => $ads,
+            'currentSort' => $sort // Pass this to the view!
         ]);
     }
 

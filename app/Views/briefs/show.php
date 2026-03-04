@@ -42,56 +42,59 @@
     </div>
 
     <!-- 2. THE ADS (The Submission Feed) -->
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <h3 class="text-info font-monospace mb-4">🛡️ LIVE ATTACKS (<?= count($ads) ?>)</h3>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <h3 class="text-info mb-0">🛡️ LIVE ATTACKS (<?= count($ads) ?>)</h3>
+            
+            <!-- THE AD SORTER -->
+            <div class="btn-group shadow-sm">
+                <a href="<?= BASE_URL ?>/brief/show/<?= $brief->id ?>?sort=newest" class="btn btn-sm <?= ($currentSort == 'newest') ? 'btn-info' : 'btn-outline-info' ?>">Newest</a>
+                <a href="<?= BASE_URL ?>/brief/show/<?= $brief->id ?>?sort=trending" class="btn btn-sm <?= ($currentSort == 'trending') ? 'btn-info' : 'btn-outline-info' ?>">🔥 Top Rated</a>
+            </div>
+        </div>
 
-            <?php if(empty($ads)): ?>
-                <div class="text-center py-5 bg-secondary rounded" style="border: 2px dashed #444;">
-                    <p class="text-muted mb-0">The target is untouched. Will you be the first to strike?</p>
-                </div>
-            <?php else: ?>
-                <?php foreach($ads as $ad): ?>
-                    <div class="card bg-secondary border-0 shadow-lg mb-5" style="border-radius: 15px; overflow: hidden;">
+        <?php if(empty($ads)): ?>
+            <div class="text-center py-5 bg-secondary rounded border border-secondary">
+                <p class="text-muted mb-0">The target is untouched. Will you be the first to strike?</p>
+            </div>
+        <?php else: ?>
+            <?php foreach($ads as $ad): ?>
+                <div class="card bg-secondary border-0 mb-5">
+                    
+                    <div class="card-header bg-dark border-bottom border-secondary d-flex justify-content-between align-items-center">
+                        <span class="text-info small">AGENCY: <strong class="text-white"><?= htmlspecialchars($ad->agency_name) ?></strong></span>
                         
-                        <!-- Submission Header: Creator Name -->
-                        <div class="card-header bg-dark border-0 d-flex justify-content-between align-items-center">
-                            <span class="text-info small">Agency: <strong><?= htmlspecialchars($ad->agency_name) ?></strong></span>
-                            
-                            <!-- THE INCINERATOR: Small icon delete -->
-                            <?php if($ad->agency_id == \App\Core\Auth::id() || \App\Core\Auth::id() == 1): ?>
-                                <a href="<?= BASE_URL ?>/ad/delete/<?= $ad->id ?>" class="text-danger text-decoration-none" onclick="return confirm('Retract your campaign?');">
-                                    🗑️
-                                </a>
-                            <?php endif; ?>
-                        </div>
+                        <!-- THE INCINERATOR FIX (No Modals, 100% reliable) -->
+                        <?php if($ad->agency_id == \App\Core\Auth::id() || \App\Core\Auth::id() == 1): ?>
+                            <a href="<?= BASE_URL ?>/ad/delete/<?= $ad->id ?>" class="btn btn-sm btn-danger px-2 py-0" onclick="return confirm('SYSTEM WARNING: Erase this campaign permanently?');">
+                                ERADICATE
+                            </a>
+                        <?php endif; ?>
+                    </div>
 
-                        <!-- The Masterpiece Ad -->
-                        <img src="<?= BASE_URL ?>/assets/uploads/<?= basename($ad->image_path) ?>" 
-                             class="img-fluid w-100" style="max-height: 450px; object-fit: contain; background: #111;">
+                    <img src="<?= BASE_URL ?>/assets/uploads/<?= basename($ad->image_path) ?>" class="img-fluid w-100" style="max-height: 450px; object-fit: contain; background: #050505;">
+                    
+                    <div class="card-body bg-dark text-center">
+                        <h4 class="text-warning mb-3">"<?= htmlspecialchars($ad->slogan) ?>"</h4>
                         
-                        <div class="card-body bg-dark text-center">
-                            <h4 class="text-warning italic mb-3">"<?= htmlspecialchars($ad->slogan) ?>"</h4>
-                            
-                            <div class="d-flex justify-content-between align-items-center border-top border-secondary pt-3">
-                                <!-- BLIND VOTING Logic -->
-                                <div id="vote-area-<?= $ad->id ?>">
-                                    <span id="score-<?= $ad->id ?>" class="fw-bold text-info me-2">
-                                        <?= ($ad->has_voted || \App\Core\Auth::id() == 1) ? $ad->vote_count : '???' ?>
-                                    </span>
-                                    <?php if(\App\Core\Session::isLoggedIn() && !$ad->has_voted): ?>
-                                        <button class="btn btn-sm btn-warning vote-btn fw-bold px-3" data-id="<?= $ad->id ?>">🔥 VOTE</button>
-                                    <?php elseif(\App\Core\Session::isLoggedIn()): ?>
-                                        <span class="badge bg-success">✅ VOTED</span>
-                                    <?php endif; ?>
-                                </div>
-                                <a href="<?= BASE_URL ?>/ad/show/<?= $ad->id ?>" class="btn btn-sm btn-outline-light">Discourse 💬</a>
+                        <div class="d-flex justify-content-between align-items-center border-top border-secondary pt-3">
+                            <div id="vote-area-<?= $ad->id ?>">
+                                <span id="score-<?= $ad->id ?>" class="fs-5 fw-bold text-info me-2">
+                                    <?= ($ad->has_voted || \App\Core\Auth::id() == 1) ? $ad->vote_count : '???' ?>
+                                </span>
+                                <?php if(\App\Core\Session::isLoggedIn() && !$ad->has_voted): ?>
+                                    <button class="btn btn-sm btn-warning vote-btn fw-bold px-3" data-id="<?= $ad->id ?>">ATTACK</button>
+                                <?php elseif(\App\Core\Session::isLoggedIn()): ?>
+                                    <span class="badge bg-success text-dark">LOCKED</span>
+                                <?php endif; ?>
                             </div>
+                            <a href="<?= BASE_URL ?>/ad/show/<?= $ad->id ?>" class="btn btn-sm btn-outline-info">TERMINAL 💬</a>
                         </div>
                     </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </div>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
     </div>
 </div>
 

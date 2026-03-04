@@ -1,111 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $title ?></title>
-    <!-- TEAM: Using Fedi's BASE_URL for perfect paths -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/bootstrap.min.css">
-</head>
-<body class="bg-dark text-white">
+<?php require '../app/Views/partials/header.php'; ?>
 
-    <!-- TEAM: The Quick Navigation Bar -->
-    <nav class="navbar navbar-dark bg-secondary mb-5 shadow-sm">
-        <div class="container">
-            <a class="navbar-brand text-warning fw-bold" href="<?= BASE_URL ?>/home">← Back to Arena</a>
-        </div>
-    </nav>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            
+            <div class="card bg-dark border-info shadow-lg position-relative overflow-hidden" style="border-radius: 20px;">
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: #00f0ff; box-shadow: 0 0 10px #00f0ff;"></div>
 
-    <div class="container">
-        
-        <!-- FLASH MESSAGES: The Manager's Sticky Notes -->
-        <?php $msg = \App\Core\Session::flash('message'); if($msg): ?>
-            <div class="alert alert-success text-center fw-bold shadow-sm mb-4"><?= $msg ?></div>
-        <?php endif; ?>
-
-        <div class="row g-4">
-            <!-- MAIN COLUMN: Agency Identity -->
-            <div class="col-md-8">
-                <div class="card bg-secondary text-light shadow-lg border-0" style="border-radius: 1rem;">
-                    <div class="card-body p-5">
-                        
-                        <div class="d-flex align-items-center mb-4">
-                            <!-- The Avatar Slot -->
-                            <div class="bg-dark rounded-circle d-flex justify-content-center align-items-center me-4 shadow" style="width: 100px; height: 100px; border: 4px solid #ffc107;">
-                                <span style="font-size: 3rem;">🏢</span>
-                            </div>
-                            <div>
-                                <!-- QUIRKY NOTE: I used htmlspecialchars here to kill XSS bugs -->
-                                <h2 class="fw-bold text-warning mb-0">
-                                    <?= htmlspecialchars(\App\Core\Session::get('user_name')) ?>
-                                </h2>
-                                <span class="badge bg-info text-dark">Official Creative Agency</span>
-                            </div>
+                <div class="card-body p-5 text-center">
+                    
+                    <h5 class="text-secondary font-monospace mb-4">AGENCY IDENTIFICATION</h5>
+                    
+                    <!-- HUGE ROBOT AVATAR -->
+                    <div class="mb-5">
+                        <div class="d-inline-block p-1 border border-warning rounded-circle bg-dark shadow-lg">
+                            <img src="https://robohash.org/<?= $user->id ?>?set=set1&size=200x200" 
+                                 class="rounded-circle" style="width: 150px; height: 150px; background: #0b0b0b;">
                         </div>
+                        <h2 class="mt-3 text-white fw-bold"><?= htmlspecialchars($user->name) ?></h2>
+                        <span class="<?= $cultivation['color'] ?> fs-5 px-4 py-2 mt-2 shadow"><?= $cultivation['rank'] ?></span>
+                    </div>
 
-                        <hr class="bg-light opacity-25 my-4">
+                    <!-- STATS GRID -->
+                    <div class="row mb-5 border-top border-bottom border-secondary py-3">
+                        <div class="col-6 border-end border-secondary">
+                            <h3 class="text-info fw-bold mb-0">ACTIVE</h3>
+                            <small class="text-muted">Status</small>
+                        </div>
+                        <div class="col-6">
+                            <h3 class="text-warning fw-bold mb-0">#<?= str_pad($user->id, 3, '0', STR_PAD_LEFT) ?></h3>
+                            <small class="text-muted">Operative ID</small>
+                        </div>
+                    </div>
 
-                        <!-- RITEJ:Identity Management (Rename Form) -->
-                        <div class="p-4 bg-dark rounded-3 border border-secondary border-opacity-25 mb-4">
-                            <form action="<?= BASE_URL ?>/auth/update" method="POST">
-                                <!-- 🛡️ THE SECRET STAMP (CSRF): Fixes the Invalid Handshake error! -->
+                    <!-- EDIT FORM -->
+                    <details class="mb-4 text-start">
+                        <summary class="btn btn-outline-light w-100 mb-3">⚙️ Edit Identity</summary>
+                        <div class="card card-body bg-secondary border-0 mt-2">
+                            <form action="<?= BASE_URL ?>/auth/updateProfile" method="POST">
                                 <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::generateCSRF(); ?>">
-                                
-                                <label class="text-info small fw-bold text-uppercase mb-2" style="font-size: 0.7rem; letter-spacing: 1px;">
-                                    Rename Your Agency
-                                </label>
-                                <div class="d-flex gap-2">
-                                    <input type="text" name="name" 
-                                           class="form-control form-control-sm bg-secondary text-white border-0" 
-                                           value="<?= htmlspecialchars(\App\Core\Session::get('user_name')) ?>" required>
-                                    <button type="submit" class="btn btn-info btn-sm fw-bold px-3">Update</button>
+                                <label class="small text-info mb-1">New Agency Name</label>
+                                <div class="input-group mb-3">
+                                    <input type="text" name="name" class="form-control bg-dark text-white border-0" value="<?= htmlspecialchars($user->name) ?>" required>
+                                    <button class="btn btn-info fw-bold">SAVE</button>
                                 </div>
                             </form>
                         </div>
+                    </details>
 
-                        <h5 class="text-info mt-4">Agency Statistics</h5>
-                        <p class="text-light opacity-75">
-                            Completed challenges and reputation points earned will appear here soon as Moataz and Sarra finish their sections!
-                        </p>
-                    </div>
+                    <a href="<?= BASE_URL ?>/auth/deleteAccount" class="btn btn-outline-danger w-100 font-monospace" onclick="return confirm('WARNING: This will permanently erase your existence from the Arena. Proceed?');">
+                        ⚠️ INITIATE SELF-DESTRUCT
+                    </a>
+
                 </div>
-            </div>
-
-            <!-- SIDE COLUMN: Settings & Danger -->
-            <div class="col-md-4">
-                
-                <!-- LOGOUT CARD -->
-                <div class="card bg-secondary border-0 shadow-sm mb-4" style="border-radius: 1rem;">
-                    <div class="card-body p-4 text-center">
-                        <p class="small opacity-75">Finished for today?</p>
-                        <a href="<?= BASE_URL ?>/auth/logout" class="btn btn-outline-light w-100 rounded-pill fw-bold">Sign Out</a>
-                    </div>
-                </div>
-
-                <!-- DANGER ZONE: Mandatory Task -->
-                <div class="card bg-dark border border-danger shadow-lg" style="border-radius: 1rem;">
-                    <div class="card-body p-4">
-                        <h5 class="text-danger fw-bold border-bottom border-danger pb-2 text-uppercase" style="font-size: 0.9rem;">Danger Zone</h5>
-                        <p class="small text-light opacity-50 mt-3">
-                            Deleting your agency is irreversible. All your data will be permanently removed.
-                        </p>
-
-                        <form action="<?= BASE_URL ?>/auth/deleteAccount" method="POST">
-                            <!-- 🛡️ CSRF TOKEN: Also needed for the Delete button! -->
-                            <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::generateCSRF(); ?>">
-                            
-                            <button type="submit" class="btn btn-danger w-100 fw-bold mt-2 rounded-pill shadow-sm" 
-                                    onclick="return confirm('Are you absolutely sure you want to destroy your agency? This cannot be undone.');">
-                                DELETE AGENCY
-                            </button>
-                        </form>
-                    </div>
-                </div>
-
             </div>
         </div>
-
     </div>
+</div>
 
-</body>
-</html>
+<?php require '../app/Views/partials/footer.php'; ?>
