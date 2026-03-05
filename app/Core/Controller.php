@@ -1,18 +1,20 @@
 <?php
 namespace App\Core;
 
-// TEAM: Every Controller you make MUST extend this class ( mouhemm barcha, khater hedha yarbet bin kol view wel DB(Model)).
+// TEAM: Every Controller you make MUST extend this class (mouhemm barcha).
 // This gives you free tools so you don't have to write boring HTML inclusion code.
 abstract class Controller {
 
-    // Gatekeeper & Creative: Use this function to show your HTML forms
-    // Example: $this->view('login',['title' => 'Sign In']);
-    public function view($view, $data =[]) {
-        
-        // This takes our data array and unpacks it into real variables for the HTML.
-        extract($data);
+    // RITEJ : Le constructeur magique. 
+    // Dès qu'un Manager (ex: AuthController) s'allume, il vérifie d'abord si l'utilisateur n'est pas endormi !
+    public function __construct() {
+        // J'appelle mon Gardien du Temps sur chaque page.
+        Auth::checkInactivity();
+    }
 
-        // Tell PHP exactly where the HTML file lives.
+    // Gatekeeper & Creative: Use this function to show your HTML forms
+    public function view($view, $data =[]) {
+        extract($data);
         $viewPath = "../app/Views/" . $view . ".php";
 
         if (file_exists($viewPath)) {

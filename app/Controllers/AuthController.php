@@ -7,7 +7,7 @@ use App\Core\Session;
 use App\Core\Auth;
 
 // TEAM: Donyes (Gatekeeper). The Security Manager.
-//  J'ai nettoyé le cerveau de la sécurité pour éviter les conflits de noms.
+// J'ai nettoyé le cerveau de la sécurité pour éviter les conflits de noms.
 class AuthController extends Controller {
 
     public function register() {
@@ -23,7 +23,7 @@ class AuthController extends Controller {
         $password = $_POST['password'];
         $confirm_password = $_POST['confirm_password'] ?? '';
 
-//  VÉRIFICATION DES ACCÈS
+        // VÉRIFICATION DES ACCÈS
         if ($password !== $confirm_password) {
             Session::flash('error', 'Passwords do not match!');
             header('Location: ' . BASE_URL . '/auth/register');
@@ -62,7 +62,7 @@ class AuthController extends Controller {
     public function authenticate() {
         Auth::requireGuest(); 
         
-        //  (Anti-Brute Force)
+        // (Anti-Brute Force)
         if (!isset($_SESSION['login_attempts'])) $_SESSION['login_attempts'] = 0;
 
         if ($_SESSION['login_attempts'] >= 3) {
@@ -91,11 +91,22 @@ class AuthController extends Controller {
 
             Session::set('user_id', $user->id);
             Session::set('user_name', $user->name);
-            // On appuie sur "START" pour le détecteur d'inactivité
-             
+            
+            // RITEJ : On appuie sur "START" pour le détecteur d'inactivité
+            // (C'est la ligne qu'il manquait pour faire marcher l'Auto-Logout !)
+            Session::set('last_activity', time()); 
+            
+            // ⏱️ SECURITY LOGGING (Ritej's God-Tier Idea)
+            date_default_timezone_set('Africa/Tunis');
+            Session::set('last_login_time', date('d/m/Y à H:i:s'));
+            Session::set('device_info', substr($_SERVER['HTTP_USER_AGENT'], 0, 35) . '...');
+            
+            Session::flash('message', 'Welcome back, Agent ' . $user->name);
+            header('Location: ' . BASE_URL . '/home');
+            exit();
 
         } else {
-           // ÉCHEC : Incrémenter le compteur de tentatives
+            // ÉCHEC : Incrémenter le compteur de tentatives
             $_SESSION['login_attempts']++; 
             $_SESSION['last_attempt_time'] = time(); 
 
@@ -114,6 +125,7 @@ class AuthController extends Controller {
         exit();
     }
     
+    // TEAM: The Locker Room
     public function profile() {
         Auth::requireLogin();
         $model = new Agency();
@@ -124,17 +136,26 @@ class AuthController extends Controller {
         ]);
     }
 
+    // ARCHITECT FIX: Changed the name back to 'updateProfile' to match the HTML form action!
+    // TEAM: This handles the "Rename Agency" form.
     public function updateProfile() {
         Auth::requireLogin();
-        if (!Session::checkCSRF($_POST['csrf_token'] ?? '')) die("Security Error");
+
+        if (!Session::checkCSRF($_POST['csrf_token'] ?? '')) {
+            die("Security Error: Invalid Handshake.");
+        }
 
         $newName = trim($_POST['name']);
+        
         if (!empty($newName)) {
             $agencyModel = new Agency();
             $agencyModel->updateName(Auth::id(), $newName);
+            
+            // Update the ID Badge instantly
             Session::set('user_name', $newName);
-            Session::flash('message', 'Agency designation updated! ✨');
+            Session::flash('message', 'Identity updated! ✨');
         }
+
         header('Location: ' . BASE_URL . '/auth/profile');
         exit();
     }
