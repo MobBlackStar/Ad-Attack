@@ -111,7 +111,7 @@ class AuthController extends Controller {
 
     // RITEJ: Renamed from 'updateProfile' to 'update' to match the URL
     // TEAM: This handles the "Rename Agency" form.
-    public function update() {
+    public function updateProfile() {
         Auth::requireLogin();
 
         if (!Session::checkCSRF($_POST['csrf_token'] ?? '')) {
