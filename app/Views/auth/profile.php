@@ -30,7 +30,6 @@
                         </div>
                     </div>
 
-                    <!-- STATS GRID -->
                     <div class="row mb-5 border-top border-bottom border-secondary py-3 bg-secondary rounded" style="opacity: 0.9;">
                         <div class="col-6 border-end border-dark">
                             <h3 class="text-info fw-bold mb-0 font-monospace">ACTIVE</h3>
@@ -41,7 +40,24 @@
                             <small class="text-light opacity-75 font-monospace">Operative ID</small>
                         </div>
                     </div>
-
+                    <!--  (Horloge & Traceur)       -->
+                    <div class="text-start bg-dark p-3 rounded border border-secondary mb-4 font-monospace shadow-inner" style="box-shadow: inset 0 0 10px #000;">
+                        <h6 class="text-success border-bottom border-secondary pb-2 mb-3">
+                            <small> SYSTEM SECURITY LOG</small>
+                        </h6>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted small">LAST LOGIN TIME:</span>
+                            <!-- On affiche l'heure, ou "Current" si c'est son tout premier login -->
+                            <span class="text-light small"><?= \App\Core\Session::get('last_login_time') ?? 'Current Session' ?></span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted small">OPERATIVE DEVICE:</span>
+                            <!-- On affiche le navigateur de l'utilisateur -->
+                            <span class="text-light small text-truncate" style="max-width: 60%;" title="<?= \App\Core\Session::get('device_info') ?? 'Unknown Device' ?>">
+                                <?= \App\Core\Session::get('device_info') ?? 'Unknown Device' ?>
+                            </span>
+                        </div>
+                    </div>
                     <!-- EDIT FORM -->
                     <details class="mb-4 text-start">
                         <summary class="btn btn-outline-info w-100 mb-3 fw-bold font-monospace" style="letter-spacing: 1px;">⚙️ CONFIGURE IDENTITY</summary>
@@ -57,7 +73,7 @@
                         </div>
                     </details>
 
-                    <!-- DANGER ZONE: Triggers the Modal below -->
+                    <!-- zone de danger -->
                     <button type="button" class="btn btn-outline-danger w-100 font-monospace fw-bold mt-3" data-bs-toggle="modal" data-bs-target="#selfDestructModal">
                         ⚠️ INITIATE SELF-DESTRUCT
                     </button>
@@ -68,9 +84,7 @@
     </div>
 </div>
 
-<!-- ========================================================================= -->
 <!-- THE CYBERPUNK SELF-DESTRUCT MODAL -->
-<!-- ========================================================================= -->
 <div class="modal fade" id="selfDestructModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-dark border-danger" style="box-shadow: 0 0 40px rgba(255,0,60,0.4); border-width: 2px;">
@@ -99,8 +113,14 @@
             
             <div class="modal-footer border-0 justify-content-center pt-0 pb-4">
                 <button type="button" class="btn btn-outline-light font-monospace px-4" data-bs-dismiss="modal">ABORT</button>
-                <a href="<?= BASE_URL ?>/auth/deleteAccount" class="btn btn-danger fw-bold font-monospace px-4 shadow">CONFIRM ERADICATION</a>
-            </div>
+
+                <!-- On remet le bouton dans un FORM avec le Sceau Secret (CSRF) pour bloquer les hackers ! -->
+                <form action="<?= BASE_URL ?>/auth/deleteAccount" method="POST" class="m-0 p-0">
+                    <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::generateCSRF(); ?>">
+                    <button type="submit" class="btn btn-danger fw-bold font-monospace px-4 shadow">CONFIRM ERADICATION</button>
+                </form>
+                
+            </div>            </div>
             
         </div>
     </div>

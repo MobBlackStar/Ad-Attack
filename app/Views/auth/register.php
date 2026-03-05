@@ -9,9 +9,9 @@
                     <h2 class="text-warning fw-bolder">AD-ATTACK</h2>
                     <p class="text-light opacity-75">Forge your Agency Identity </p>
                 </div>
-                  <?php $error = \App\Core\Session::flash('error'); ?>
-      <!--  ZONE D'AFFICHAGE DES ERREURS -->
-                    <!-- s'affichera "Password too weak" ou "Email taken" -->
+                
+                <?php $error = \App\Core\Session::flash('error'); ?>
+                <!-- ZONE D'AFFICHAGE DES ERREURS -->
                 <?php if($error): ?>
                     <div class="alert alert-danger text-center fw-bold shadow-sm mb-4">
                          <?= $error ?>
@@ -20,9 +20,6 @@
 
                 <form action="<?= BASE_URL ?>/auth/store" method="POST">
                     <!-- securité : CSFR -->
-
-              
-
                     <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::generateCSRF(); ?>">
                     
                     <div class="form-floating mb-3 text-dark">
@@ -38,10 +35,28 @@
                     <div class="form-floating mb-4 text-dark">
                         <input type="password" class="form-control fw-bold" id="passwordInput" name="password" placeholder="password" required>
                         <label for="passwordInput">Secret password</label>
-                        <small class="text-muted d-block mt-1" style="font-size: 0.8rem;">
-Must contain: 8 chars, 1 Uppercase, 1 Number, 1 Symbol
                     </div>
-                    
+
+                    <div class="mb-3">
+                        <small class="text-muted d-block mt-1" style="font-size: 0.8rem;">
+                            Must contain: 8 chars, 1 Uppercase, 1 Number, 1 Symbol
+                        </small>
+                    </div>
+
+                    <!-- LA DOUBLE SERRURE (Confirmation du mot de passe) -->
+                    <div class="form-floating mb-4 text-dark">
+                        <input type="password" class="form-control fw-bold border-warning" id="confirmPasswordInput" name="confirm_password" placeholder="Confirm password" required>
+                        <label for="confirmPasswordInput">Confirm secret password</label>
+                    </div>
+
+                    <!-- L'Interrupteur de Lumière (Œil Magique) -->
+                    <div class="form-check mb-4 text-start ms-1">
+                        <input class="form-check-input bg-dark border-secondary" type="checkbox" id="showPassword" onclick="togglePassword()">
+                        <label class="form-check-label text-light opacity-75 small" style="cursor: pointer;" for="showPassword">
+                            👁️ Show Passwords
+                        </label>
+                    </div>
+
                     <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold rounded-pill shadow-sm">
                        ENTER THE ARENA
                     </button>
@@ -50,12 +65,27 @@ Must contain: 8 chars, 1 Uppercase, 1 Number, 1 Symbol
                 <div class="text-center mt-4">
                     <a href="<?= BASE_URL ?>/auth/login" class="text-warning text-decoration-none">
                         <small>Already have a badge? Login here</small>
-
+                    </a>
                 </div>
 
             </div>
         </div>
     </div>
 </div>
+
+<!-- RITEJ : Le petit robot JavaScript qui allume la lumière -->
+<script>
+    function togglePassword() {
+        var pass = document.getElementById("passwordInput");
+        var conf = document.getElementById("confirmPasswordInput");
+        if (pass.type === "password") {
+            pass.type = "text";
+            if(conf) conf.type = "text";
+        } else {
+            pass.type = "password";
+            if(conf) conf.type = "password";
+        }
+    }
+</script>
 
 <?php require '../app/Views/partials/footer.php'; ?>
