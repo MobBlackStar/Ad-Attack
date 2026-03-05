@@ -44,7 +44,30 @@ Must contain: 8 chars, 1 Uppercase, 1 Number, 1 Symbol
     <label for="confirmPasswordInput">Confirm secret password</label>
 </div>
                     </div>
-                    
+                    <!-- L'Interrupteur de Lumière (Œil Magique) -->
+                    <div class="form-check mb-4 text-start ms-1">
+                        <input class="form-check-input bg-dark border-secondary" type="checkbox" id="showPassword" onclick="togglePassword()">
+                        <label class="form-check-label text-light opacity-75 small" style="cursor: pointer;" for="showPassword">
+                            👁️ Show Passwords
+                        </label>
+                    </div>
+
+                    <!--RITEJ : Le petit robot JavaScript qui allume la lumière -->
+                    <script>
+                        function togglePassword() {
+                            // On attrape les deux cases
+                            var pass = document.getElementById("passwordInput");
+                            var conf = document.getElementById("confirmPasswordInput");
+                            // Si la case est en mode "secret" (password), on la passe en mode "texte"
+                            if (pass.type === "password") {
+                                pass.type = "text";
+                                if(conf) conf.type = "text";
+                            } else {
+                                pass.type = "password";
+                                if(conf) conf.type = "password";
+                            }
+                        }
+                    </script>
                     <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold rounded-pill shadow-sm">
                        ENTER THE ARENA
                     </button>

@@ -4,7 +4,7 @@ namespace App\Core;
 // TEAM: Every Controller you make MUST extend this class ( mouhemm barcha, khater hedha yarbet bin kol view wel DB(Model)).
 // This gives you free tools so you don't have to write boring HTML inclusion code.
 abstract class Controller {
-    
+
     // Gatekeeper & Creative: Use this function to show your HTML forms
     // Example: $this->view('login',['title' => 'Sign In']);
     public function view($view, $data =[]) {
