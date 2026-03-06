@@ -9,8 +9,14 @@
                     
                     <!-- FEDI: Smart Display. Show Image OR External Link Button -->
                     <?php if(!empty($ad->image_path)): ?>
-                        <img src="<?= BASE_URL ?>/assets/uploads/<?= basename($ad->image_path) ?>" 
-                             class="img-fluid rounded-top w-100" style="max-height: 500px; object-fit: contain; background: #000;" alt="Ad Masterpiece">
+                        <?php $isExternal = preg_match('#^https?://#i', $ad->image_path); ?>
+                        <?php if($isExternal): ?>
+                            <img src="<?= htmlspecialchars($ad->image_path) ?>" 
+                                 class="img-fluid rounded-top w-100" style="max-height: 500px; object-fit: contain; background: #000;" alt="Ad Masterpiece">
+                        <?php else: ?>
+                            <img src="<?= BASE_URL ?>/assets/uploads/<?= basename($ad->image_path) ?>" 
+                                 class="img-fluid rounded-top w-100" style="max-height: 500px; object-fit: contain; background: #000;" alt="Ad Masterpiece">
+                        <?php endif; ?>
                     <?php elseif(!empty($ad->external_link)): ?>
                         <div class="p-5 text-center bg-dark rounded-top d-flex flex-column justify-content-center" style="height: 300px;">
                             <h1 class="display-1">🔗</h1>

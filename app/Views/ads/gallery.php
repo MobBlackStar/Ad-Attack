@@ -59,7 +59,8 @@
                         <?php endif; ?>
                     </div>
 
-                    <img src="<?= BASE_URL ?>/assets/uploads/<?= basename($ad->image_path) ?>" class="img-fluid w-100" style="max-height: 600px; object-fit: contain; background: #000;">
+                    <?php $isExternal = !empty($ad->image_path) && preg_match('#^https?://#i', $ad->image_path); ?>
+                    <img src="<?= $isExternal ? htmlspecialchars($ad->image_path) : (BASE_URL . '/assets/uploads/' . basename($ad->image_path)) ?>" class="img-fluid w-100" style="max-height: 600px; object-fit: contain; background: #000;">
 
                     <div class="card-body p-4 bg-dark">
                         <h2 class="text-warning text-center mb-4 fst-italic">"<?= htmlspecialchars($ad->slogan) ?>"</h2>

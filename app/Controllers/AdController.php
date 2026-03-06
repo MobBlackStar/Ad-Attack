@@ -75,28 +75,47 @@ class AdController extends Controller {
 
     public function store() {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $image = $_FILES['ad_image'];
-            $targetDir = "assets/uploads/";
-            $fileName = time() . "_" . basename($image["name"]);
-            $targetFilePath = $targetDir . $fileName;
+            if (!\App\Core\Session::checkCSRF($_POST['csrf_token'] ?? '')) die("CSRF Error");
 
-            if (move_uploaded_file($image["tmp_name"], "../public/" . $targetFilePath)) {
-                $adModel = new Ad();
-                $agency_id = Session::get('user_id') ?? 1;
+            $external = trim($_POST['external_link'] ?? '');
+            $hasUpload = isset($_FILES['ad_image']) && !empty($_FILES['ad_image']['name']) && ($_FILES['ad_image']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK;
 
-                $adModel->createAd([
-                    'brief_id'   => $_POST['brief_id'] ?? 1,
-                    'agency_id'  => $agency_id,
-                    'slogan'     => $_POST['slogan'],
-                    'image_path' => $targetFilePath
-                ]);
+            $imagePathToSave = null;
 
-                Session::flash('success', 'L\'attaque est lancée ! 🚀');
-                header("Location: " . BASE_URL . "/index.php?url=ad/index");
-                exit();
+            if ($external !== '') {
+                // Security: accept only http(s) URLs (we store the URL, we don't fetch it)
+                if (!filter_var($external, FILTER_VALIDATE_URL) || !preg_match('#^https?://#i', $external)) {
+                    die("Security Error: Invalid external link.");
+                }
+                $imagePathToSave = $external;
+            } elseif ($hasUpload) {
+                $image = $_FILES['ad_image'];
+                $targetDir = "assets/uploads/";
+                $fileName = time() . "_" . basename($image["name"]);
+                $targetFilePath = $targetDir . $fileName;
+
+                if (!move_uploaded_file($image["tmp_name"], "../public/" . $targetFilePath)) {
+                    echo "Erreur lors de l'upload de l'image.";
+                    exit();
+                }
+                $imagePathToSave = $targetFilePath;
             } else {
-                echo "Erreur lors de l'upload de l'image.";
+                die("Erreur: Please upload an image or provide an external link.");
             }
+
+            $adModel = new Ad();
+            $agency_id = Session::get('user_id') ?? 1;
+
+            $adModel->createAd([
+                'brief_id'   => $_POST['brief_id'] ?? 1,
+                'agency_id'  => $agency_id,
+                'slogan'     => $_POST['slogan'],
+                'image_path' => $imagePathToSave
+            ]);
+
+            Session::flash('success', 'L\'attaque est lancée ! 🚀');
+            header("Location: " . BASE_URL . "/index.php?url=ad/index");
+            exit();
         }
     }
 

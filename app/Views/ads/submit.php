@@ -17,7 +17,13 @@
 
                 <div class="mb-4">
                     <label class="form-label fw-bold">2. Your Masterpiece (Image)</label>
-                    <input type="file" name="ad_image" class="form-control bg-dark text-white border-0" accept="image/*" required>
+                    <input type="file" name="ad_image" class="form-control bg-dark text-white border-0" accept="image/*">
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">3. Or use an External Link (Image URL)</label>
+                    <input type="url" name="external_link" class="form-control bg-dark text-white border-0" placeholder="https://example.com/image.jpg">
+                    <div class="form-text text-light opacity-75">Upload a file OR paste a direct image link.</div>
                 </div>
 
                 <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold rounded-pill">
