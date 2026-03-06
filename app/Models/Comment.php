@@ -9,7 +9,7 @@ class Comment extends Model {
     
     protected $table = 'comments';
 
-    // Save a new feedback to the database
+    // enregistre un nouveau commentaire dans la base de données
     public function add($ad_id, $agency_id, $content) {
         $sql = "INSERT INTO comments (ad_id, agency_id, content) VALUES (:ad, :agency, :content)";
         $stmt = $this->db->prepare($sql);

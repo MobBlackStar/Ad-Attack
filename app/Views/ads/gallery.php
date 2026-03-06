@@ -7,6 +7,7 @@
         <?php if(empty($ads)): ?>
             <div class="text-center py-5 bg-dark border border-secondary rounded shadow">
                 <h3 class="text-muted font-monospace">SIGNAL LOST... NO ADS FOUND.</h3>
+        <!-- Base url pour le lien de soumission -->
                 <a href="<?= BASE_URL ?>/ad/submit" class="btn btn-warning mt-3 fw-bold">INITIATE FIRST ATTACK</a>
             </div>
         <?php else: ?>
@@ -27,14 +28,16 @@
                         </div>
                         
                         <!-- THE INCINERATOR: MODAL TRIGGER -->
+                         <!-- TEAM: Only show delete button if user is owner or admin -->
                         <?php if($ad->agency_id == \App\Core\Auth::id() || \App\Core\Auth::id() == 1): ?>
-                            <!-- Clicking this opens the specific modal for this Ad -->
+                            <!-- ouvre le modal de suppression -->
                             <button type="button" class="btn btn-sm btn-outline-danger border-0" 
                                     data-bs-toggle="modal" data-bs-target="#deleteAdModal-<?= $ad->id ?>">
                                 🗑️
                             </button>
                             
                             <!-- THE CYBERPUNK DELETE MODAL -->
+                             <!-- on utilise un modal pour eviter les suppressions accidentelles, et pour ajouter du style à l'action de suppression -->
                             <div class="modal fade" id="deleteAdModal-<?= $ad->id ?>" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content bg-dark text-white border-danger shadow-lg" style="box-shadow: 0 0 20px rgba(255, 0, 60, 0.5);">
@@ -65,7 +68,7 @@
                         <h2 class="text-warning text-center mb-4 fst-italic">"<?= htmlspecialchars($ad->slogan) ?>"</h2>
                         
                         <div class="d-flex justify-content-between align-items-center border-top border-secondary pt-3">
-                            <!-- UPDATED VOTING UI -->
+                             <!-- Logique Blind Vote : On cache le score si l'utilisateur n'a pas voté -->
                             <div id="vote-area-<?= $ad->id ?>">
                                 <span id="score-<?= $ad->id ?>" class="fs-4 fw-bold text-info me-3 font-monospace">
                                     <?= ($ad->has_voted || \App\Core\Auth::id() == 1) ? $ad->vote_count : '???' ?>

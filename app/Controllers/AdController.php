@@ -11,33 +11,33 @@ use App\Core\Auth;
 class AdController extends Controller {
 
     // TEAM: Sarra - The Ad Shredder. 
-    // Only the artist who made the Ad (or the Overlord) can delete it.
+    // Je vérifie l'identité. Seul le créateur ou l'Admin (ID 1) peut supprimer.
     public function delete($id) {
         Auth::requireLogin();
         $model = new Ad();
         $ad = $model->find($id);
-
+        //on que seul le créateur de l'annonce ou l'admin peut supprimer
         if ($ad && ($ad->agency_id == Auth::id() || Auth::id() == 1)) {
             $model->delete($id);
             Session::flash('message', 'Masterpiece removed from gallery.');
         }
+        // Redirection vers la galerie après suppression
         header('Location: ' . BASE_URL . '/index.php?url=ad/index');
         exit();
     }
-
-    // THE EXHIBITION: Shows all ads with Blind Voting logic
+    // THE GALLERY: Shows all ads with their vote counts and user's vote status
     public function index() {
         $adModel = new Ad();
         $voteModel = new \App\Models\Vote(); 
         
         // ARCHITECT FIX: Use the new method to grab names!
         $allAds = $adModel->getAllWithAgency();
-
+       //Chaque ad doit savoir combien de votes elle a et si l'utilisateur connecté a déjà voté
         foreach ($allAds as $ad) {
             $ad->vote_count = $voteModel->getCount($ad->id);
             $ad->has_voted = Session::isLoggedIn() ? $voteModel->hasVoted($ad->id, Auth::id()) : false;
         }
-
+      // On envoie tout ça à la vue de la galerie
         $this->view('ads/gallery',[
             'title' => 'Ad-Attack | The Gallery',
             'ads'   => $allAds
@@ -45,11 +45,12 @@ class AdController extends Controller {
     }
 
     // THE JUDGING ROOM: Shows one ad, its comments, and its vote status
+    //affiche une annonce, ses commentaires et son statut de vote
     public function show($id) {
         $adModel = new Ad();
         $commentModel = new Comment();
         $voteModel = new Vote();
-
+        
         $ad = $adModel->find($id);
         if (!$ad) { die("Cette œuvre n'existe pas !"); }
         
@@ -57,7 +58,7 @@ class AdController extends Controller {
         $ad->has_voted = Session::isLoggedIn() ? $voteModel->hasVoted($ad->id, Auth::id()) : false;
 
         $comments = $commentModel->getByAd($id);
-
+       // On envoie tout ça à la vue du Judging Room
         $this->view('ads/show', [
             'title'    => 'Judging: ' . $ad->slogan,
             'ad'       => $ad,
@@ -65,32 +66,36 @@ class AdController extends Controller {
         ]);
     }
 
-    // Affiche le formulaire
+    // affiche le formulaire de soumission d'une nouvelle annonce
     public function submit($brief_id = 1) {
         $this->view('ads/submit', [
             'title'    => 'Submit your Ad',
             'brief_id' => $brief_id
         ]);
     }
-
+    // Traite la soumission d'une nouvelle annonce
     public function store() {
+        //je vérifie que c'est une requete POST
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $image = $_FILES['ad_image'];
             $targetDir = "assets/uploads/";
+            // 1. Sécurité : On renomme l'image avec l'heure (time) pour éviter les doublons
             $fileName = time() . "_" . basename($image["name"]);
             $targetFilePath = $targetDir . $fileName;
-
+           // 2. Physique : On déplace l'image du dossier temporaire vers le dossier final
             if (move_uploaded_file($image["tmp_name"], "../public/" . $targetFilePath)) {
+                // 3. Base de données : On enregistre le CHEMIN, pas l'image elle-même
                 $adModel = new Ad();
+                // TEAM: Sarra - On utilise l'ID de session pour l'agence, ou 1 par défaut (Admin)
                 $agency_id = Session::get('user_id') ?? 1;
-
+                
                 $adModel->createAd([
                     'brief_id'   => $_POST['brief_id'] ?? 1,
                     'agency_id'  => $agency_id,
                     'slogan'     => $_POST['slogan'],
                     'image_path' => $targetFilePath
                 ]);
-
+                // 4. Flash message et redirection
                 Session::flash('success', 'L\'attaque est lancée ! 🚀');
                 header("Location: " . BASE_URL . "/index.php?url=ad/index");
                 exit();
@@ -117,9 +122,9 @@ class AdController extends Controller {
     // 🎭 SARRA: VOICI LA FONCTION MANQUANTE POUR L'AJAX !
     // ==========================================================
     public function vote($ad_id) {
-        // On dit au navigateur qu'on va lui répondre en langage "Robot" (JSON)
+        // 1.On dit au navigateur qu'on va lui répondre en langage "Robot" (JSON)
         header('Content-Type: application/json');
-
+       // 2. Sécurité : Pas de vote si pas connecté
         if (!Session::isLoggedIn()) {
             echo json_encode(['success' => false, 'message' => 'Connecte-toi pour voter !']);
             exit();
@@ -136,6 +141,7 @@ class AdController extends Controller {
             $newScore = $voteModel->getCount($ad_id);
             echo json_encode(['success' => true, 'new_score' => $newScore]);
         } else {
+            // Si le vote a échoué (ex: déjà voté), on envoie un message d'erreur
             echo json_encode(['success' => false, 'message' => 'Tu as déjà voté !']);
         }
         exit();
@@ -147,7 +153,7 @@ class AdController extends Controller {
         $model = new Ad();
         $ad = $model->find($id);
 
-        // Security: Only the owner or Overlord can edit
+        // Securité: Seul le créateur de l'annonce ou l'Admin (ID 1) peut éditer
         if (!$ad || ($ad->agency_id != \App\Core\Auth::id() && \App\Core\Auth::id() != 1)) {
             die("Security Error: You cannot paint over someone else's work.");
         }
@@ -159,7 +165,9 @@ class AdController extends Controller {
     }
 
     // TEAM: Sarra - Save the new slogan
+    
     public function update($id) {
+        
         \App\Core\Auth::requireLogin();
         if (!\App\Core\Session::checkCSRF($_POST['csrf_token'] ?? '')) die("CSRF Error");
 
