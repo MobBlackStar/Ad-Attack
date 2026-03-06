@@ -28,7 +28,8 @@ CREATE TABLE ads (
     brief_id INT NOT NULL,
     agency_id INT NOT NULL, -- The Creator
     slogan VARCHAR(255), -- The Catchy Text
-    image_path VARCHAR(255) NOT NULL, -- The Photoshoped Image
+    image_path VARCHAR(255) NOT NULL, -- The Photoshoped Image (upload path or fallback)
+    external_link VARCHAR(255) NULL,  -- Optional external URL for the creative
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (brief_id) REFERENCES briefs(id) ON DELETE CASCADE,
     FOREIGN KEY (agency_id) REFERENCES agencies(id) ON DELETE CASCADE
