@@ -3,14 +3,16 @@ namespace App\Models;
 use App\Core\Model;
 
 // TEAM - Sarra : Mon ouvrier spécialisé pour les publicités (Ads).
+// Astuce SQL : ajoute une colonne nullable 'external_link' dans la table 'ads'
+// pour pouvoir enregistrer un lien vers la campagne (landing page, vidéo, etc.).
 class Ad extends Model {
     
     protected $table = 'ads';
 
-    // TEAM : On sauvegarde la pub et le nom de l'image dans la DB
+    // TEAM : On sauvegarde la pub, le nom de l'image et, si fourni, le lien externe dans la DB
     public function createAd($data) {
-        $sql = "INSERT INTO ads (brief_id, agency_id, slogan, image_path) 
-                VALUES (:brief_id, :agency_id, :slogan, :image_path)";
+        $sql = "INSERT INTO ads (brief_id, agency_id, slogan, image_path, external_link) 
+                VALUES (:brief_id, :agency_id, :slogan, :image_path, :external_link)";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute($data);
     }
@@ -52,11 +54,27 @@ class Ad extends Model {
         return $stmt->fetchAll();
     }
     
-    // TEAM: Sarra - Let the artist fix their typos!
-    public function updateSlogan($id, $slogan) {
-        $sql = "UPDATE ads SET slogan = :slogan WHERE id = :id";
+    // TEAM: Sarra - Let the artist fix their typos (et mettre à jour le lien si besoin).
+    public function updateSlogan($id, $slogan, $externalLink = null) {
+        // Explication simple : si on reçoit un lien, on le met à jour en même temps que le slogan.
+        // Sinon, on touche uniquement au texte, on ne casse pas les anciennes pubs.
+        if ($externalLink !== null) {
+            $sql = "UPDATE ads SET slogan = :slogan, external_link = :external_link WHERE id = :id";
+            $params = [
+                'slogan'        => $slogan,
+                'external_link' => $externalLink,
+                'id'            => $id
+            ];
+        } else {
+            $sql = "UPDATE ads SET slogan = :slogan WHERE id = :id";
+            $params = [
+                'slogan' => $slogan,
+                'id'     => $id
+            ];
+        }
+
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute(['slogan' => $slogan, 'id' => $id]);
+        return $stmt->execute($params);
     }
 
     // TEAM: Fedi - Added a JOIN so the Main Gallery shows REAL names, not "Unknown".
