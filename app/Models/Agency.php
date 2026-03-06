@@ -9,7 +9,6 @@ use App\Core\Model;
 //   ALTER TABLE agencies ADD COLUMN avatar_set VARCHAR(10) DEFAULT 'set1';
 class Agency extends Model {
 
-    // TEAM: Fedi - This finds the Top 3 Agencies for the Hall of Fame.
     // It sums up all votes received on all ads for each agency.
     public function getLeaderboard() {
         $sql = "SELECT a.id, a.name, COALESCE(a.avatar_set, 'set1') as avatar_set, COUNT(v.id) as total_qi 
@@ -30,9 +29,9 @@ class Agency extends Model {
     
     protected $table = 'agencies';
 
-    // RITEJ: Saves a new agency with a hashed password
+    // Enregistre une nouvelle agence avec un mot de passe haché
     public function register($name, $email, $password) {
-        // SECURITY: Hashing the password 
+        // SECURITE: Hashing le mot de passe  
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
         $sql = "INSERT INTO {$this->table} (name, email, password) VALUES (:name, :email, :password)";
@@ -45,7 +44,7 @@ class Agency extends Model {
         ]);
     }
 
-    // RITEJ: The Detective. Searches the warehouse for a specific email.
+    // Chercher le warehouse pour un mail specifique 
     public function findByEmail($email) {
         $sql = "SELECT * FROM {$this->table} WHERE email = :email LIMIT 1";
         $stmt = $this->db->prepare($sql);
@@ -53,8 +52,8 @@ class Agency extends Model {
         return $stmt->fetch(); 
     }
 
-    // RITEJ: The Eraser. Updates the name on the agency folder.
-    // TEAM: Use this for the "Modification du Profil" requirement
+    // changer le nom au niveau du fichier agency
+    //  "Modification du nom"
     public function updateName($id, $newName) {
         $sql = "UPDATE {$this->table} SET name = :name WHERE id = :id";
         $stmt = $this->db->prepare($sql);

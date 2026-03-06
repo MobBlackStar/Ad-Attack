@@ -29,7 +29,7 @@ class AuthController extends Controller {
             header('Location: ' . BASE_URL . '/auth/register');
             exit();
         }
-
+// On scanne le mot de passe pour garantir une robustesse contre les attaques par dictionnaire.
         if (strlen($password) < 8 || !preg_match('/[A-Z]/', $password) || !preg_match('/[0-9]/', $password) || !preg_match('/[^a-zA-Z0-9]/', $password)) {
             Session::flash('error', 'Weak password! Use 8+ chars, 1 Uppercase, 1 Number and 1 Symbol.');
             header('Location: ' . BASE_URL . '/auth/register');
@@ -58,6 +58,7 @@ class AuthController extends Controller {
         Auth::requireGuest(); 
         $this->view('auth/login', ['title' => 'Ad-Attack | Identification']);
     }
+// Si une IP échoue 3 fois, on gèle l'accès pour 30 secondes afin de bloquer les robots malveillants.
 
     public function authenticate() {
         Auth::requireGuest(); 

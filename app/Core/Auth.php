@@ -1,15 +1,13 @@
 <?php
 namespace App\Core;
 
-// TEAM: This is our "Security Guard". 
-// Donyes (Gatekeeper): Use this to protect the 'Profile' or 'Logout' pages.
 class Auth {
 
-    // RITEJ : LE GARDIEN DU TEMPS (Auto-Logout)
-    // L'explication Feynman : C'est une minuterie. Si personne ne bouge pendant 15 minutes, on éteint la lumière.
+    // LE GARDIEN DU TEMPS (Auto-Logout)
+    //  C'est une minuterie. Si personne ne bouge pendant 15 minutes, on éteint la lumière.
     public static function checkInactivity() {
         
-        // RITEJ (FIX): La "Valve de Sécurité". 
+        //  La "Valve de Sécurité". 
         // Si on est déjà en train de se connecter ou déconnecter, on n'a pas besoin de vérifier l'inactivité.
         // Ça évite que le Gardien nous jette dehors alors qu'on est déjà dehors ! (Boucle infinie).
         $currentPage = $_SERVER['REQUEST_URI'] ?? '';
@@ -59,7 +57,7 @@ class Auth {
         }
     }
 
-    // A quick way to get the current user's ID from their ID Badge
+//  Un moyen rapide d'obtenir l'ID de l'utilisateur actuel à partir de son Badge (Session).
     public static function id() {
         return Session::get('user_id');
     }
