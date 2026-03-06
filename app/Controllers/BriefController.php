@@ -136,12 +136,29 @@ class BriefController extends Controller {
         if (!Session::checkCSRF($_POST['csrf_token'] ?? '')) die("CSRF Error");
 
         $model = new Brief();
-        $data =[
+        $brief = $model->find($id);
+        if (!$brief || ($brief->agency_id != Auth::id() && Auth::id() != 1)) {
+            die("Error: You do not have permission to edit this blueprint.");
+        }
+
+        $data = [
             'title'       => $_POST['title'],
             'description' => $_POST['description'],
             'category'    => $_POST['category'],
-            'deadline'    => $_POST['deadline']
+            'deadline'    => $_POST['deadline'],
+            'image'       => !empty($brief->image) ? basename($brief->image) : ''
         ];
+
+        // Optional new image upload (fix broken or replace)
+        if (!empty($_FILES['brief_image']['name']) && $_FILES['brief_image']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = dirname(__DIR__, 2) . "/public/assets/uploads/";
+            if (!is_dir($uploadDir)) { mkdir($uploadDir, 0777, true); }
+            $imageName = time() . '_' . $_FILES['brief_image']['name'];
+            $destination = $uploadDir . $imageName;
+            if (move_uploaded_file($_FILES['brief_image']['tmp_name'], $destination)) {
+                $data['image'] = $imageName;
+            }
+        }
 
         if ($model->updateBrief($id, $data)) {
             Session::flash('message', 'Brief blueprint updated successfully! 💾');

@@ -14,11 +14,10 @@
                 <!-- TEAM: The "Billboard" Card Style -->
                 <div class="card bg-secondary border-0 shadow-lg mb-5 position-relative" style="border-radius: 20px; overflow: hidden;">
                     
-                    <!-- Header of the Ad: Creator Info -->
+                    <!-- Header -->
                     <div class="card-header bg-dark border-0 p-3 d-flex align-items-center justify-content-between">
                         <div class="d-flex align-items-center">
-                            <!-- Robot Avatar -->
-                            <img src="https://robohash.org/<?= $ad->agency_id ?>?set=set1" 
+                            <img src="https://robohash.org/<?= $ad->agency_id ?>?set=<?= htmlspecialchars($ad->avatar_set ?? 'set1') ?>" 
                                  class="rounded-circle border border-secondary me-3"
                                  style="width: 45px; height: 45px; background: #000;">
                             <div>
@@ -27,27 +26,32 @@
                             </div>
                         </div>
                         
-                        <!-- THE INCINERATOR (Modal Trigger) -->
+                        <!-- THE INCINERATOR: MODAL TRIGGER -->
                         <?php if($ad->agency_id == \App\Core\Auth::id() || \App\Core\Auth::id() == 1): ?>
-                            <button type="button" class="btn btn-sm btn-outline-danger border-0" data-bs-toggle="modal" data-bs-target="#deleteAdModal-<?= $ad->id ?>">
+                            <!-- Clicking this opens the specific modal for this Ad -->
+                            <button type="button" class="btn btn-sm btn-outline-danger border-0" 
+                                    data-bs-toggle="modal" data-bs-target="#deleteAdModal-<?= $ad->id ?>">
                                 🗑️
                             </button>
                             
-                            <!-- DELETE MODAL -->
+                            <!-- THE CYBERPUNK DELETE MODAL -->
                             <div class="modal fade" id="deleteAdModal-<?= $ad->id ?>" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content bg-dark text-white border-danger shadow-lg">
+                                    <div class="modal-content bg-dark text-white border-danger shadow-lg" style="box-shadow: 0 0 20px rgba(255, 0, 60, 0.5);">
                                         <div class="modal-header border-secondary">
-                                            <h5 class="modal-title text-danger fw-bold">CONFIRM ERADICATION</h5>
+                                            <h5 class="modal-title text-danger fw-bold font-monospace">⚠️ ERADICATION PROTOCOL</h5>
                                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                         </div>
                                         <div class="modal-body text-center p-4">
                                             <p class="fs-5">Are you sure you want to delete this campaign?</p>
-                                            <p class="small text-muted">"<?= htmlspecialchars($ad->slogan) ?>"</p>
+                                            <p class="small text-muted font-monospace">"<?= htmlspecialchars($ad->slogan) ?>"</p>
+                                            <div class="alert alert-danger bg-transparent border-danger mt-3 small">
+                                                This action is irreversible. The data will be lost in the void.
+                                            </div>
                                         </div>
                                         <div class="modal-footer border-secondary justify-content-center">
-                                            <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">CANCEL</button>
-                                            <a href="<?= BASE_URL ?>/ad/delete/<?= $ad->id ?>" class="btn btn-danger fw-bold">ERADICATE</a>
+                                            <button type="button" class="btn btn-outline-light font-monospace" data-bs-dismiss="modal">ABORT</button>
+                                            <a href="<?= BASE_URL ?>/ad/delete/<?= $ad->id ?>" class="btn btn-danger fw-bold font-monospace shadow">CONFIRM DELETION</a>
                                         </div>
                                     </div>
                                 </div>
@@ -55,31 +59,30 @@
                         <?php endif; ?>
                     </div>
 
-                    <!-- The Masterpiece -->
                     <img src="<?= BASE_URL ?>/assets/uploads/<?= basename($ad->image_path) ?>" class="img-fluid w-100" style="max-height: 600px; object-fit: contain; background: #000;">
 
                     <div class="card-body p-4 bg-dark">
                         <h2 class="text-warning text-center mb-4 fst-italic">"<?= htmlspecialchars($ad->slogan) ?>"</h2>
                         
                         <div class="d-flex justify-content-between align-items-center border-top border-secondary pt-3">
-                            <!-- BLIND VOTING Logic inside the Feed -->
+                            <!-- UPDATED VOTING UI -->
                             <div id="vote-area-<?= $ad->id ?>">
                                 <span id="score-<?= $ad->id ?>" class="fs-4 fw-bold text-info me-3 font-monospace">
                                     <?= ($ad->has_voted || \App\Core\Auth::id() == 1) ? $ad->vote_count : '???' ?>
                                 </span>
                                 
                                 <?php if(\App\Core\Session::isLoggedIn()): ?>
-                                    <?php if(!$ad->has_voted): ?>
-                                        <button class="btn btn-warning vote-btn px-4 rounded-pill fw-bold" data-id="<?= $ad->id ?>">🔥 ATTACK</button>
-                                    <?php else: ?>
-                                        <button class="btn btn-success disabled px-4 rounded-pill fw-bold" disabled>✅ VOTED</button>
-                                    <?php endif; ?>
+                                    <!-- Dynamic Button Class based on status -->
+                                    <button class="btn <?= $ad->has_voted ? 'btn-success' : 'btn-warning' ?> vote-btn px-4 rounded-pill fw-bold" 
+                                            data-id="<?= $ad->id ?>">
+                                        <?= $ad->has_voted ? '✅ VOTED' : '🔥 ATTACK' ?>
+                                    </button>
                                 <?php else: ?>
                                     <a href="<?= BASE_URL ?>/auth/login" class="btn btn-sm btn-outline-info">Login to Vote</a>
                                 <?php endif; ?>
                             </div>
 
-                            <a href="<?= BASE_URL ?>/ad/show/<?= $ad->id ?>" class="text-decoration-none text-light small">
+                            <a href="<?= BASE_URL ?>/ad/show/<?= $ad->id ?>" class="text-decoration-none text-muted small font-monospace">
                                 💬 VIEW INTEL
                             </a>
                         </div>

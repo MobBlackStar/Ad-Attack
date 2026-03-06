@@ -96,7 +96,9 @@
                             </div>
                         <?php endif; ?>
 
-                        <img src="<?= BASE_URL ?>/assets/uploads/<?= $brief->image ?>" class="card-img-top" style="height: 220px; object-fit: cover;">
+                        <?php $briefImg = !empty($brief->image) ? basename($brief->image) : ''; ?>
+                        <img src="<?= $briefImg ? BASE_URL . '/assets/uploads/' . htmlspecialchars($briefImg) : '' ?>" class="card-img-top" style="height: 220px; object-fit: cover;" alt="<?= htmlspecialchars($brief->title ?? 'Brief') ?>"
+                             onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'220\'%3E%3Crect fill=\'%23333\' width=\'400\' height=\'220\'/%3E%3Ctext fill=\'%23666\' x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'sans-serif\' font-size=\'14\'%3ENo image%3C/text%3E%3C/svg%3E';">
                         
                         <div class="card-body d-flex flex-column bg-dark">
                             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -111,7 +113,7 @@
                             
                             <div class="mt-auto d-flex gap-2">
                                 <a href="<?= BASE_URL ?>/brief/show/<?= $brief->id ?>" class="btn btn-warning w-100 fw-bold shadow-sm">VIEW BRIEF</a>
-                                <?php if($brief->agency_id == \App\Core\Auth::id()): ?>
+                                <?php if($brief->agency_id == \App\Core\Auth::id() || \App\Core\Auth::id() == 1): ?>
                                     <a href="<?= BASE_URL ?>/brief/edit/<?= $brief->id ?>" class="btn btn-info shadow-sm" title="Edit Brief">✏️</a>
                                 <?php endif; ?>
                             </div>

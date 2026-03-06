@@ -13,7 +13,7 @@ class Brief extends Model {
 
     public function updateBrief($id, $data) {
         $sql = "UPDATE briefs SET title = :title, description = :description, 
-                category = :category, deadline = :deadline WHERE id = :id";
+                category = :category, deadline = :deadline, image = :image WHERE id = :id";
         $data['id'] = $id;
         return $this->db->prepare($sql)->execute($data);
     }

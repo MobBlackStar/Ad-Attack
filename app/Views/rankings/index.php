@@ -27,8 +27,8 @@
                             <!-- The Rank Number (#1, #2, #3) -->
                             <h1 class="display-4 fw-bold me-4 mb-0" style="color: <?= $glow ?>;">#<?= $index + 1 ?></h1>
                             
-                            <!-- Robohash Avatar -->
-                            <img src="https://robohash.org/<?= $leader->id ?>?set=set1&size=100x100" 
+                            <!-- Robohash Avatar (TEAM: each agency's chosen style) -->
+                            <img src="https://robohash.org/<?= $leader->id ?>?set=<?= htmlspecialchars($leader->avatar_set ?? 'set1') ?>&size=100x100" 
                                  class="rounded-circle border border-secondary me-4"
                                  style="width: 80px; height: 80px; background: #111;">
 

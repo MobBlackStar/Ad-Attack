@@ -14,10 +14,10 @@
                     
                     <h5 class="text-info font-monospace mb-4 fw-bold" style="letter-spacing: 2px;">[ AGENCY_IDENTIFICATION ]</h5>
                     
-                    <!-- HUGE ROBOT AVATAR -->
+                    <!-- HUGE ROBOT AVATAR (TEAM: uses avatar_set from profile selector) -->
                     <div class="mb-5">
                         <div class="d-inline-block p-1 border border-warning rounded-circle bg-dark shadow-lg">
-                            <img src="https://robohash.org/<?= $user->id ?>?set=set1&size=200x200" 
+                            <img src="https://robohash.org/<?= $user->id ?>?set=<?= htmlspecialchars($user->avatar_set ?? 'set1') ?>&size=200x200" 
                                  class="rounded-circle" style="width: 150px; height: 150px; background: #0b0b0b; box-shadow: inset 0 0 10px #f3e600;">
                         </div>
                         <h2 class="mt-4 text-white fw-bold font-monospace text-uppercase"><?= htmlspecialchars($user->name) ?></h2>
@@ -69,6 +69,17 @@
                                     <input type="text" name="name" class="form-control bg-secondary text-white border-0 fw-bold" value="<?= htmlspecialchars($user->name) ?>" required>
                                     <button class="btn btn-info fw-bold text-dark font-monospace">UPDATE</button>
                                 </div>
+                                <!-- TEAM: Robohash style selector – set3=Heads, set4=Cats (official API order) -->
+                                <label class="small text-info mb-2 font-monospace mt-3 d-block">AVATAR STYLE</label>
+                                <select name="avatar_set" class="form-select bg-secondary text-white border-0 mb-2">
+                                    <option value="set1" <?= ($user->avatar_set ?? 'set1') == 'set1' ? 'selected' : '' ?>>🤖 Robots</option>
+                                    <option value="set2" <?= ($user->avatar_set ?? 'set1') == 'set2' ? 'selected' : '' ?>>👾 Monsters</option>
+                                    <option value="set3" <?= ($user->avatar_set ?? 'set1') == 'set3' ? 'selected' : '' ?>>👤 Heads</option>
+                                    <option value="set4" <?= ($user->avatar_set ?? 'set1') == 'set4' ? 'selected' : '' ?>>🐱 Cats</option>
+                                    <option value="set5" <?= ($user->avatar_set ?? 'set1') == 'set5' ? 'selected' : '' ?>>👷 Humans</option>
+                                    <option value="set6" <?= ($user->avatar_set ?? 'set1') == 'set6' ? 'selected' : '' ?>>🎖️ Guerrilla</option>
+                                    <option value="any" <?= ($user->avatar_set ?? 'set1') == 'any' ? 'selected' : '' ?>>🎲 Random mix</option>
+                                </select>
                             </form>
                         </div>
                     </details>

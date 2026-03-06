@@ -35,7 +35,7 @@
                                         
                                         <!-- AVATAR (Robohash Magic) -->
                                         <td>
-                                            <img src="https://robohash.org/<?= $agency->id ?>?set=set1&size=100x100" 
+                                            <img src="https://robohash.org/<?= $agency->id ?>?set=<?= htmlspecialchars($agency->avatar_set ?? 'set1') ?>&size=100x100" 
                                                  alt="Avatar" 
                                                  class="rounded-circle border border-secondary p-1"
                                                  style="width: 50px; height: 50px; background: #000;">

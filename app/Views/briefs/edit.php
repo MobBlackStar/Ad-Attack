@@ -6,7 +6,7 @@
             <h2 class="text-warning mb-4">✏️ Edit Brief: <?= htmlspecialchars($brief->title) ?></h2>
             
             <!-- TEAM: Moataz here. This form sends data to the 'update' method in the Controller -->
-            <form action="<?= BASE_URL ?>/brief/update/<?= $brief->id ?>" method="POST" class="card bg-secondary p-4 shadow">
+            <form action="<?= BASE_URL ?>/brief/update/<?= $brief->id ?>" method="POST" enctype="multipart/form-data" class="card bg-secondary p-4 shadow">
                 
                 <!-- THE SHIELD: Don't forget the CSRF token Fedi asked for -->
                 <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::generateCSRF(); ?>">
@@ -36,7 +36,22 @@
                     </div>
                 </div>
 
-                <div class="alert alert-info small">Note: To keep things simple, images cannot be changed during editing.</div>
+                <!-- Optional: replace image (fix broken or update) -->
+                <div class="mb-3">
+                    <label class="form-label">Current image</label>
+                    <?php $briefImg = !empty($brief->image) ? basename($brief->image) : ''; ?>
+                    <?php if ($briefImg): ?>
+                        <img src="<?= BASE_URL ?>/assets/uploads/<?= htmlspecialchars($briefImg) ?>" class="img-fluid rounded border border-secondary mb-2" style="max-height: 180px; object-fit: contain;" alt="Current" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <p class="text-muted small mb-0" style="display:none;">No image or broken. Upload below to fix.</p>
+                    <?php else: ?>
+                        <p class="text-muted small mb-0">No image. Upload below to set one.</p>
+                    <?php endif; ?>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Replace image (optional)</label>
+                    <input type="file" name="brief_image" class="form-control" accept="image/*">
+                    <div class="form-text text-light">Leave empty to keep current. Upload a new file to fix broken or replace.</div>
+                </div>
 
                 <button type="submit" class="btn btn-warning fw-bold w-100">SAVE CHANGES 💾</button>
             </form>

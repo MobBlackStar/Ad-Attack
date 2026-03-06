@@ -15,10 +15,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const scoreSpan = document.getElementById("score-" + adId);
             const btn = this;
 
+            // Prevent double-tap / multiple requests (fixes visual bug)
+            if (btn.disabled) return;
+            btn.disabled = true;
+
             // Send a secret "Fetch" request to our PHP Controller
             // Note: We use the BASE_URL logic via a relative path
-           // TEAM - Sarra: I updated the fetch path to work on WAMP Localhost!
-            // We must route it through index.php
+            // TEAM - Sarra : J'ai mis à jour le chemin fetch pour que ça marche sur WAMP Localhost !
+            // On doit passer par index.php obligatoirement.
             fetch("index.php?url=vote/cast", {
                 method: "POST",
                 headers: {
@@ -33,19 +37,29 @@ document.addEventListener("DOMContentLoaded", () => {
                     // Update the "???" to the real number instantly
                     scoreSpan.innerText = data.new_score;
                     
-                    // Make it look cool (Green text)
+                    // Make the score look cool (Green text)
                     scoreSpan.classList.remove("text-muted");
                     scoreSpan.classList.add("text-success", "fw-bold");
                     
-                    // Disable the button so they can't click again
-                    btn.classList.add("disabled", "btn-success");
-                    btn.classList.remove("btn-outline-warning");
-                    btn.innerText = "Voted!";
+                    // ARCHITECT UPDATE: Toggle Logic (Vote vs Unvote)
+                    if (data.action === 'voted') {
+                        // Turn Green if we just voted
+                        btn.classList.remove("btn-warning", "btn-outline-warning");
+                        btn.classList.add("btn-success");
+                        btn.innerText = "✅ VOTED";
+                    } else {
+                        // Turn back to Orange if we unvoted (Regret)
+                        btn.classList.remove("btn-success");
+                        btn.classList.add("btn-warning");
+                        btn.innerText = "🔥 ATTACK";
+                    }
+                    
                 } else {
                     alert(data.message); // Tell them if they aren't logged in
                 }
             })
-            .catch(error => console.error("System Error:", error));
+            .catch(error => console.error("System Error:", error))
+            .finally(() => { btn.disabled = false; });
         });
     });
 });

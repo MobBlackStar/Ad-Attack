@@ -8,23 +8,20 @@ use PDOException;
 // It uses the "Singleton" pattern. 3leh? Because if 100 people visit our site, 
 // we don't want to open 100 power cables to the database and crash the server.
 // We only open ONE connection and share it.
+//
+// FEDI: So I noticed we had db.php in gitignore but never created the file.
+// To be fully committed to the checklist, config now lives in /config.
 class Database {
     
     private static $instance = null;
     private $connection;
 
-    // Gatekeeper, Client, Creative: Do NOT put your passwords here. 
-    // This is for local WAMP testing only.
-    private $host = 'localhost';
-    private $db_name = 'ad_attack_db';
-    private $username = 'root';
-    private $password = ''; 
-
     private function __construct() {
+        require_once dirname(__DIR__, 2) . '/config/db.php';
+
         try {
-            // Plug in the power cable to MySQL
-            $dsn = "mysql:host={$this->host};dbname={$this->db_name};charset=utf8";
-            $this->connection = new PDO($dsn, $this->username, $this->password);
+            $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8";
+            $this->connection = new PDO($dsn, DB_USER, DB_PASS);
             
             // Make sure the database yells at us if we write bad SQL
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

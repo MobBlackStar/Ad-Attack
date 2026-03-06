@@ -91,7 +91,8 @@ class AuthController extends Controller {
 
             Session::set('user_id', $user->id);
             Session::set('user_name', $user->name);
-            
+            Session::set('avatar_set', $user->avatar_set ?? 'set1'); // TEAM: Robohash style for header/nav
+
             // RITEJ : On appuie sur "START" pour le détecteur d'inactivité
             // (C'est la ligne qu'il manquait pour faire marcher l'Auto-Logout !)
             Session::set('last_activity', time()); 
@@ -146,15 +147,18 @@ class AuthController extends Controller {
         }
 
         $newName = trim($_POST['name']);
-        
+        $avatarSet = $_POST['avatar_set'] ?? 'set1';
+
+        $agencyModel = new Agency();
         if (!empty($newName)) {
-            $agencyModel = new Agency();
             $agencyModel->updateName(Auth::id(), $newName);
-            
-            // Update the ID Badge instantly
             Session::set('user_name', $newName);
-            Session::flash('message', 'Identity updated! ✨');
         }
+        // TEAM: Robohash style selector – update avatar set if valid
+        if ($agencyModel->updateAvatarSet(Auth::id(), $avatarSet)) {
+            Session::set('avatar_set', $avatarSet);
+        }
+        Session::flash('message', 'Identity updated! ✨');
 
         header('Location: ' . BASE_URL . '/auth/profile');
         exit();

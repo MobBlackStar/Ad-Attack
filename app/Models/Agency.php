@@ -4,12 +4,15 @@ use App\Core\Model;
 
 // TEAM: Donyes's Worker for the 'agencies' table.
 // I've trained this worker to handle all our Agency paperwork
+//
+// ROBOHASH STYLE: Run this once in phpMyAdmin to add avatar selector support:
+//   ALTER TABLE agencies ADD COLUMN avatar_set VARCHAR(10) DEFAULT 'set1';
 class Agency extends Model {
 
     // TEAM: Fedi - This finds the Top 3 Agencies for the Hall of Fame.
     // It sums up all votes received on all ads for each agency.
     public function getLeaderboard() {
-        $sql = "SELECT a.id, a.name, COUNT(v.id) as total_qi 
+        $sql = "SELECT a.id, a.name, COALESCE(a.avatar_set, 'set1') as avatar_set, COUNT(v.id) as total_qi 
                 FROM agencies a
                 LEFT JOIN ads ad ON a.id = ad.agency_id
                 LEFT JOIN votes v ON ad.id = v.ad_id
@@ -59,6 +62,15 @@ class Agency extends Model {
             'name' => $newName,
             'id' => $id
         ]);
+    }
+
+    // TEAM: Robohash style selector – stores user's avatar set (set3=Heads, set4=Cats, any=random)
+    public function updateAvatarSet($id, $set) {
+        $allowed = ['set1', 'set2', 'set3', 'set4', 'set5', 'set6', 'any'];
+        if (!in_array($set, $allowed)) return false;
+        $sql = "UPDATE {$this->table} SET avatar_set = :set WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute(['set' => $set, 'id' => $id]);
     }
 
     // ---------------------------------------------------------

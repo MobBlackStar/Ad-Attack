@@ -15,7 +15,7 @@ class VoteController extends Controller {
         
         // 1. Security: Only logged-in agencies can vote
         if (!Session::isLoggedIn()) {
-            echo json_encode(['status' => 'error', 'message' => 'You must be logged in to vote!']);
+            echo json_encode(['status' => 'error', 'message' => 'Login required']);
             exit;
         }
 
@@ -28,19 +28,31 @@ class VoteController extends Controller {
             exit;
         }
 
-        // 3. Drop the ballot in the box
         $voteModel = new Vote();
-        $voteModel->cast($ad_id, Auth::id());
+        $userId = Auth::id();
+        $action = '';
+
+        // 3. THE TOGGLE LOGIC (Smart Switch)
+        if ($voteModel->hasVoted($ad_id, $userId)) {
+            // If they already voted, REMOVE it (Unvote)
+            $voteModel->remove($ad_id, $userId);
+            $action = 'unvoted';
+        } else {
+            // If they haven't voted, ADD it (Vote)
+            $voteModel->cast($ad_id, $userId);
+            $action = 'voted';
+        }
 
         // 4. Recount the votes immediately
         $newCount = $voteModel->getCount($ad_id);
 
-        // 5. Whisper back the new score to the browser
+        // 5. Whisper back the new score and the ACTION taken
         header('Content-Type: application/json');
         echo json_encode([
             'status' => 'success', 
             'new_score' => $newCount,
-            'message' => 'Vote Registered!'
+            'action' => $action, // Tell JS if we added or removed
+            'message' => ($action == 'voted' ? 'Vote Registered!' : 'Vote Removed.')
         ]);
         exit;
     }

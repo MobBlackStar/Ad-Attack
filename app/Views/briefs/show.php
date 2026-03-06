@@ -6,9 +6,11 @@
         <div class="col-md-10">
             <div class="card bg-dark border-warning shadow-lg" style="border-radius: 20px; border-width: 2px;">
                 <div class="row g-0">
-                    <div class="col-md-5">
-                        <img src="<?= BASE_URL ?>/assets/uploads/<?= $brief->image ?>" 
-                             class="img-fluid rounded-start h-100" style="object-fit: cover;" alt="Target Object">
+                    <div class="col-md-5 position-relative">
+                        <?php $briefImg = !empty($brief->image) ? basename($brief->image) : ''; ?>
+                        <img src="<?= $briefImg ? BASE_URL . '/assets/uploads/' . htmlspecialchars($briefImg) : '' ?>" 
+                             class="img-fluid rounded-start h-100" style="object-fit: cover;" alt="<?= htmlspecialchars($brief->title ?? 'Target') ?>"
+                             onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\'%3E%3Crect fill=\'%23333\' width=\'400\' height=\'300\'/%3E%3Ctext fill=\'%23666\' x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'sans-serif\' font-size=\'18\'%3EImage unavailable%3C/text%3E%3C/svg%3E';">
                     </div>
                     <div class="col-md-7 p-4">
                         <span class="badge bg-warning text-dark mb-2"><?= $brief->category ?></span>
@@ -65,11 +67,31 @@
                     <div class="card-header bg-dark border-bottom border-secondary d-flex justify-content-between align-items-center">
                         <span class="text-info small">AGENCY: <strong class="text-white"><?= htmlspecialchars($ad->agency_name) ?></strong></span>
                         
-                        <!-- THE INCINERATOR FIX (No Modals, 100% reliable) -->
+                        <!-- THE INCINERATOR FIX (No Modals, 100% reliable) - Modal confirm instead of browser pop-up -->
                         <?php if($ad->agency_id == \App\Core\Auth::id() || \App\Core\Auth::id() == 1): ?>
-                            <a href="<?= BASE_URL ?>/ad/delete/<?= $ad->id ?>" class="btn btn-sm btn-danger px-2 py-0" onclick="return confirm('SYSTEM WARNING: Erase this campaign permanently?');">
+                            <button type="button" class="btn btn-sm btn-danger px-2 py-0" data-bs-toggle="modal" data-bs-target="#deleteAdModal-<?= $ad->id ?>">
                                 ERADICATE
-                            </a>
+                            </button>
+                            <!-- ERADICATION CONFIRM MODAL -->
+                            <div class="modal fade" id="deleteAdModal-<?= $ad->id ?>" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content bg-dark text-white border-danger shadow-lg" style="box-shadow: 0 0 20px rgba(255, 0, 60, 0.5);">
+                                        <div class="modal-header border-secondary">
+                                            <h5 class="modal-title text-danger fw-bold font-monospace">⚠️ ERADICATION PROTOCOL</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body text-center p-4">
+                                            <p class="fs-5">Are you sure you want to delete this campaign?</p>
+                                            <p class="small text-muted font-monospace">"<?= htmlspecialchars($ad->slogan) ?>"</p>
+                                            <div class="alert alert-danger bg-transparent border-danger mt-3 small">This action is irreversible.</div>
+                                        </div>
+                                        <div class="modal-footer border-secondary justify-content-center">
+                                            <button type="button" class="btn btn-outline-light font-monospace" data-bs-dismiss="modal">ABORT</button>
+                                            <a href="<?= BASE_URL ?>/ad/delete/<?= $ad->id ?>" class="btn btn-danger fw-bold font-monospace shadow">CONFIRM DELETION</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         <?php endif; ?>
                     </div>
 
@@ -83,10 +105,10 @@
                                 <span id="score-<?= $ad->id ?>" class="fs-5 fw-bold text-info me-2">
                                     <?= ($ad->has_voted || \App\Core\Auth::id() == 1) ? $ad->vote_count : '???' ?>
                                 </span>
-                                <?php if(\App\Core\Session::isLoggedIn() && !$ad->has_voted): ?>
-                                    <button class="btn btn-sm btn-warning vote-btn fw-bold px-3" data-id="<?= $ad->id ?>">ATTACK</button>
-                                <?php elseif(\App\Core\Session::isLoggedIn()): ?>
-                                    <span class="badge bg-success text-dark">LOCKED</span>
+                                <?php if(\App\Core\Session::isLoggedIn()): ?>
+                                    <button class="btn btn-sm <?= $ad->has_voted ? 'btn-success' : 'btn-warning' ?> vote-btn fw-bold px-3" data-id="<?= $ad->id ?>">
+                                        <?= $ad->has_voted ? '✅ VOTED' : '🔥 ATTACK' ?>
+                                    </button>
                                 <?php endif; ?>
                             </div>
                             <a href="<?= BASE_URL ?>/ad/show/<?= $ad->id ?>" class="btn btn-sm btn-outline-info">TERMINAL 💬</a>

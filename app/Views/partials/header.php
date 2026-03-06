@@ -48,8 +48,8 @@
                     <?php endif; ?>
 
                     <li class="nav-item ms-4 d-flex align-items-center">
-                        <!-- ROBOHASH AVATAR IN HEADER -->
-                        <img src="https://robohash.org/<?= \App\Core\Session::get('user_id') ?>?set=set1" 
+                        <!-- ROBOHASH AVATAR IN HEADER (TEAM: uses avatar_set from session) -->
+                        <img src="https://robohash.org/<?= \App\Core\Session::get('user_id') ?>?set=<?= htmlspecialchars(\App\Core\Session::get('avatar_set') ?? 'set1') ?>" 
                              alt="User" class="rounded-circle border border-info me-2" 
                              style="width: 35px; height: 35px; background: #000;">
                         

@@ -17,7 +17,7 @@ class Ad extends Model {
 
     // ARCHITECT FIX: Joins with agencies so we can see the REAL name of the creator!
     public function find($id) {
-        $sql = "SELECT ads.*, agencies.name as agency_name 
+        $sql = "SELECT ads.*, agencies.name as agency_name, COALESCE(agencies.avatar_set, 'set1') as avatar_set 
                 FROM ads 
                 JOIN agencies ON ads.agency_id = agencies.id 
                 WHERE ads.id = :id";
@@ -28,7 +28,7 @@ class Ad extends Model {
 
     // TEAM: Fedi added Sorting for the Ads inside a Brief!
     public function getByBriefWithAgency($brief_id, $sort = 'newest') {
-        $sql = "SELECT ads.*, agencies.name as agency_name,
+        $sql = "SELECT ads.*, agencies.name as agency_name, COALESCE(agencies.avatar_set, 'set1') as avatar_set,
                 (SELECT COUNT(*) FROM votes WHERE votes.ad_id = ads.id) as vote_total
                 FROM ads 
                 JOIN agencies ON ads.agency_id = agencies.id 
@@ -61,7 +61,7 @@ class Ad extends Model {
 
     // TEAM: Fedi - Added a JOIN so the Main Gallery shows REAL names, not "Unknown".
     public function getAllWithAgency() {
-        $sql = "SELECT ads.*, agencies.name as agency_name 
+        $sql = "SELECT ads.*, agencies.name as agency_name, COALESCE(agencies.avatar_set, 'set1') as avatar_set 
                 FROM ads 
                 LEFT JOIN agencies ON ads.agency_id = agencies.id 
                 ORDER BY ads.created_at DESC";
