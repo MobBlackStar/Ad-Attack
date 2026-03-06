@@ -1,11 +1,8 @@
 <?php
 namespace App\Core;
 
-// TEAM: Every Controller you make MUST extend this class (mouhemm barcha).
-// This gives you free tools so you don't have to write boring HTML inclusion code.
 abstract class Controller {
 
-    // RITEJ : Le constructeur magique. 
     // Dès qu'un Manager (ex: AuthController) s'allume, il vérifie d'abord si l'utilisateur n'est pas endormi !
     public function __construct() {
         // J'appelle mon Gardien du Temps sur chaque page.

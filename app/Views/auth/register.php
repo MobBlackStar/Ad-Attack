@@ -73,7 +73,7 @@
     </div>
 </div>
 
-<!-- RITEJ : Le petit robot JavaScript qui allume la lumière -->
+<!-- Le petit robot JavaScript qui allume la lumière -->
 <script>
     function togglePassword() {
         var pass = document.getElementById("passwordInput");

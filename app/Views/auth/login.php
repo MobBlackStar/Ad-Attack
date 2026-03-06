@@ -3,7 +3,7 @@
 <div class="row justify-content-center mt-5 mb-5">
     <div class="col-md-5">
         
-        <!-- RITEJ : SECURITY SPEAKER (For Error Messages) -->
+        <!-- pour les messages d erreur  -->
         <?php $error = \App\Core\Session::flash('error'); ?>
         <?php if($error): ?>
             <div class="alert alert-danger text-center fw-bold shadow-sm mb-4">
@@ -27,7 +27,7 @@
                 
                 <form action="<?= BASE_URL ?>/auth/authenticate" method="POST">
                     
-                    <!-- SECURITY: CSRF Token -->
+<!-- SÉCURITÉ : Jeton CSRF (Sceau d'authenticité pour bloquer les robots) -->
                     <input type="hidden" name="csrf_token" value="<?= \App\Core\Session::generateCSRF(); ?>">
 
                     <div class="form-floating mb-3 text-dark">
@@ -35,7 +35,7 @@
                         <label for="logEmail">Professional Email</label>
                     </div>
 
-                    <!-- PASSWORD WITH MAGIC EYE -->
+                    <!-- mot de passe avec l oeil magique  -->
                     <div class="input-group mb-4">
                         <div class="form-floating flex-grow-1">
                             <input type="password" name="password" id="logPass" class="form-control fw-bold border-end-0" placeholder="Password" style="border-top-right-radius: 0; border-bottom-right-radius: 0;" required>
@@ -61,10 +61,12 @@
     </div>
 </div>
 
-<!-- RITEJ: Simple script to toggle password visibility -->
+<!-- RITEJ : Interrupteur de visibilité (UI/UX) - Permet à l'utilisateur de basculer 
+     entre le mode "caché" et le mode "texte" pour vérifier sa saisie sans erreur. -->
 <script>
     function toggleLoginPass() {
         var x = document.getElementById("logPass");
+                // On vérifie le type actuel du champ pour le basculer
         if (x.type === "password") {
             x.type = "text";
         } else {
